@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.BYDDeviceOperationRecordReportMapper">
+
+    <resultMap type="com.miracle.extra.domain.BYDDeviceOperationRecordReport" id="BYDDeviceOperationRecordReportResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="deviceNo" column="DeviceNo" />
+        <result property="deviceType" column="DeviceType" />
+        <result property="productModel" column="ProductModel" />
+        <result property="workOrder" column="WorkOrder" />
+        <result property="barCode" column="BarCode" />
+        <result property="workResults" column="WorkResults" />
+        <result property="defectReason" column="DefectReason" />
+        <result property="workDate" column="WorkDate" />
+        <result property="createTime" column="CreateTime" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.BYDDeviceOperationRecordReport$OperationBarCodeDetail" id="OperationBarCodeDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="barCode" column="BarCode" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.BYDDeviceOperationRecordReport$OperationMaterialBatchDetail" id="OperationMaterialBatchDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="materialBatch" column="MaterialBatch" />
+        <result property="materialModel" column="MaterialModel" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.BYDDeviceOperationRecordReport$OperationMaterialBarCodeDetail" id="OperationMaterialBarCodeDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="materialBarCode" column="MaterialBarCode" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.BYDDeviceOperationRecordReport$OperationDataInfoDetail" id="OperationDataInfoDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="nodeIndex" column="NodeIndex" />
+        <result property="dataNo" column="DataNo" />
+        <result property="dataName" column="DataName" />
+        <result property="dataValue" column="DataValue" />
+    </resultMap>
+
+    <sql id="selectBYDDeviceOperationRecordReportVo">
+        select Id, DataTrackId, DeviceNo, DeviceType, ProductModel, WorkOrder, BarCode, 
+               WorkResults, DefectReason, WorkDate, CreateTime
+        from BYD_DeviceOperationRecord
+    </sql>
+
+    <select id="selectBYDDeviceOperationRecordReportList" parameterType="com.miracle.extra.domain.BYDDeviceOperationRecordReport" resultMap="BYDDeviceOperationRecordReportResult">
+        <include refid="selectBYDDeviceOperationRecordReportVo" />
+        <where>
+            <if test="deviceNo != null and deviceNo != ''">AND DeviceNo LIKE CONCAT('%', #{deviceNo}, '%')</if>
+            <if test="deviceType != null and deviceType != ''">AND DeviceType LIKE CONCAT('%', #{deviceType}, '%')</if>
+            <if test="productModel != null and productModel != ''">AND ProductModel LIKE CONCAT('%', #{productModel}, '%')</if>
+            <if test="workOrder != null and workOrder != ''">AND WorkOrder LIKE CONCAT('%', #{workOrder}, '%')</if>
+            <if test="workResults != null and workResults != ''">AND WorkResults = #{workResults}</if>
+            <if test="barCode != null and barCode != ''">AND BarCode LIKE CONCAT('%', #{barCode}, '%')</if>
+            <if test="searchBarCode != null and searchBarCode != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM BYD_OperationBarCodeDetail WHERE BarCode LIKE CONCAT('%', #{searchBarCode}, '%'))
+            </if>
+            <if test="searchMaterialBatch != null and searchMaterialBatch != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM BYD_OperationMaterialBatchDetail WHERE MaterialBatch LIKE CONCAT('%', #{searchMaterialBatch}, '%'))
+            </if>
+            <if test="searchMaterialBarCode != null and searchMaterialBarCode != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM BYD_OperationMaterialBarCodeDetail WHERE MaterialBarCode LIKE CONCAT('%', #{searchMaterialBarCode}, '%'))
+            </if>
+            <if test="workDateStart != null">AND WorkDate &gt;= #{workDateStart}</if>
+            <if test="workDateEnd != null">AND WorkDate &lt;= #{workDateEnd}</if>
+        </where>
+        order by WorkDate desc
+    </select>
+
+    <select id="selectBarCodeListByDataTrackId" parameterType="string" resultMap="OperationBarCodeDetailResult">
+        SELECT Id, DataTrackId, BarCode 
+        FROM BYD_OperationBarCodeDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectMaterialBatchListByDataTrackId" parameterType="string" resultMap="OperationMaterialBatchDetailResult">
+        SELECT Id, DataTrackId, MaterialBatch,MaterialModel
+        FROM BYD_OperationMaterialBatchDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectMaterialBarCodeListByDataTrackId" parameterType="string" resultMap="OperationMaterialBarCodeDetailResult">
+        SELECT Id, DataTrackId, MaterialBarCode 
+        FROM BYD_OperationMaterialBarCodeDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectDataInfoListByDataTrackId" parameterType="string" resultMap="OperationDataInfoDetailResult">
+        SELECT Id, DataTrackId, NodeIndex, DataNo, DataName, DataValue 
+        FROM BYD_OperationDataInfoDetail 
+        WHERE DataTrackId = #{dataTrackId}
+        ORDER BY NodeIndex
+    </select>
+
+</mapper>

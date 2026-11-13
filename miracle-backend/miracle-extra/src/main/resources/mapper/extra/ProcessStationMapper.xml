@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.ProcessStationMapper">
+
+    <resultMap type="com.miracle.extra.domain.ProductSN" id="ProductSNResult">
+        <id property="id" column="Id" />
+        <result property="barcode" column="Barcode" />
+        <result property="productId" column="ProductId" />
+        <result property="productRoutingId" column="ProductRoutingId" />
+        <result property="status" column="Status" />
+        <result property="lastProcessId" column="LastProcessId" />
+        <result property="nextProcessIds" column="NextProcessIds" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.ProductRoutingStep" id="ProductRoutingStepResult">
+        <id property="processId" column="ProcessId" />
+        <result property="sequence" column="Sequence" />
+        <result property="barcodeVerify" column="BarcodeVerify" />
+        <result property="sequenceVerify" column="SequenceVerify" />
+        <result property="duplicateVerify" column="DuplicateVerify" />
+        <result property="requiredCount" column="RequiredCount" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.StationRecord" id="StationRecordResult">
+        <id property="processId" column="ProcessId" />
+        <result property="result" column="Result" />
+        <result property="barcode" column="BarCode" />
+        <result property="productId" column="ProductId" />
+        <result property="productRoutingId" column="ProductRoutingId" />
+        <result property="equipmentId" column="EquipmentId" />
+        <result property="resultDetail" column="ResultDetail" />
+        <result property="dataTraceId" column="DataTraceId" />
+        <result property="createTime" column="CreateTime" />
+        <result property="isReworkVoid" column="IsReworkVoid" />
+    </resultMap>
+
+    <select id="selectEquipmentIdByCode" parameterType="string" resultType="java.lang.Integer">
+        SELECT Id FROM Equipments WHERE SKEquipmentCode = #{equipmentCode} AND ActiveStatus = 1 AND Deleted = 0
+    </select>
+
+    <select id="selectProductIdByCode" parameterType="string" resultType="java.lang.Integer">
+        SELECT ISNULL(
+            (SELECT Id FROM Products
+                WHERE ProductCode = #{productCode}
+                    AND ActiveStatus = 1
+                    AND Deleted = 0),
+            ISNULL(
+            (SELECT TOP 1 pe.ProductId
+                    FROM ProductExtraItems pe
+                    INNER JOIN Products p ON pe.ProductId = p.Id
+                WHERE pe.ExtraItemCode = #{productCode}
+                    AND pe.ActiveStatus = 1
+                    AND pe.Deleted = 0
+                    AND p.ActiveStatus = 1
+                    AND p.Deleted = 0),
+                0
+            )
+        )
+    </select>
+
+    <select id="selectProductRoutingIdByProductId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT Id FROM ProductRoutings WHERE ProductId = #{productId} AND ActiveStatus = 1 AND Deleted = 0
+    </select>
+
+    <select id="selectProductSNsByBarcode" parameterType="string" resultMap="ProductSNResult">
+        SELECT Id, Barcode, ProductId, ProductRoutingId, Status, LastProcessId, NextProcessIds FROM ProductSNs WHERE Barcode = #{barcode} AND Deleted = 0
+    </select>
+
+    <select id="selectDeviceSteps" parameterType="map" resultMap="ProductRoutingStepResult">
+        SELECT prs.ProcessId, prs.Sequence, prs.BarcodeVerify, prs.SequenceVerify, prs.DuplicateVerify, prs.RequiredCount
+        FROM ProductRoutingSteps prs
+        INNER JOIN ProcessEquipments pe ON prs.ProcessId = pe.ProcessId
+        WHERE prs.ProductRouteVersionId = #{routingId}
+          AND pe.EquipmentId = #{equipmentId}
+          AND pe.ActiveStatus = 1 AND pe.Deleted = 0
+          AND prs.ActiveStatus = 1 AND prs.Deleted = 0
+        ORDER BY prs.Sequence ASC
+    </select>
+
+    <select id="selectAllSteps" parameterType="java.lang.Integer" resultMap="ProductRoutingStepResult">
+        SELECT ProcessId, Sequence
+        FROM ProductRoutingSteps
+        WHERE ProductRouteVersionId = #{routingId} AND ActiveStatus = 1 AND Deleted = 0
+        ORDER BY Sequence ASC
+    </select>
+
+    <select id="selectStationRecordsByBarcode" parameterType="string" resultMap="StationRecordResult">
+        SELECT BarCode, ProcessId, Result, ProductId, ProductRoutingId, EquipmentId, ResultDetail, DataTraceId, CreateTime ,IsReworkVoid
+        FROM StationRecords WHERE BarCode = #{barcode} AND Deleted = 0
+    </select>
+
+    <select id="selectBarcodeRuleByProductId" parameterType="java.lang.Integer" resultType="java.lang.String">
+        SELECT BarcodeRule FROM Products WHERE Id = #{productId} AND Deleted = 0
+    </select>
+
+    <insert id="insertProductSN" parameterType="map">
+        INSERT INTO ProductSNs (Barcode, ProductId, ProductRoutingId, Status, CreateTime, CreateBy, Deleted)
+        VALUES (#{barcode}, #{productId}, #{routingId}, #{status}, #{createTime}, #{createBy}, 0)
+    </insert>
+
+    <update id="updateProductSN" parameterType="map">
+        UPDATE ProductSNs 
+        SET Status = #{status}, LastProcessId = #{lastProcessId}, NextProcessIds = #{nextProcessIds} 
+        WHERE Id = #{id}
+    </update>
+
+    <insert id="insertStationRecord" parameterType="map">
+        INSERT INTO StationRecords (BarCode, ProductId, ProductRoutingId, ProcessId, EquipmentId, Result, ResultDetail, DataTraceId, CreateTime, Deleted)
+        VALUES (#{barcode}, #{productId}, #{productRoutingId}, #{processId}, #{equipmentId}, #{result}, #{resultDetail}, #{dataTraceId}, #{createTime}, 0)
+    </insert>
+
+</mapper>

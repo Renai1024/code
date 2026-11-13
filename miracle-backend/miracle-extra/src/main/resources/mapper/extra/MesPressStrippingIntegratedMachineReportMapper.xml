@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesPressStrippingIntegratedMachineReportMapper">
+
+    <resultMap type="MesPressStrippingIntegratedMachineReport" id="MesPressStrippingIntegratedMachineReportResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="createtime"/>
+        <result property="no" column="no"/>
+        <result property="operationTime" column="operationtime"/>
+        <result property="workOrder" column="workorder"/>
+        <result property="terminalName" column="terminalname"/>
+        <result property="productName" column="productname"/>
+        <result property="ratedCompressionHeight" column="ratedcompressionheight"/>
+        <result property="cfa" column="cfa"/>
+        <result property="cfmThreshold" column="cfmthreshold"/>
+        <result property="pressure" column="pressure"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="selectMesPressStrippingIntegratedMachineReportVo">
+        SELECT
+            Id AS id,
+            CreateTime AS createtime,
+            "NO" AS no,
+            OperationTime AS operationtime,
+            WorkOrder AS workorder,
+            TerminalName AS terminalname,
+            ProductName AS productname,
+            RatedCompressionHeight AS ratedcompressionheight,
+            CFA AS cfa,
+            CFMThreshold AS cfmthreshold,
+            Pressure AS pressure,
+            Status AS status
+        FROM dbo.PressStrippingIntegratedMachine
+    </sql>
+
+    <select id="selectMesPressStrippingIntegratedMachineReportList" parameterType="MesPressStrippingIntegratedMachineReport" resultMap="MesPressStrippingIntegratedMachineReportResult">
+        <include refid="selectMesPressStrippingIntegratedMachineReportVo"/>
+        <where>
+            <if test="no != null and no != ''">
+                AND [NO] LIKE CONCAT('%', #{no}, '%')
+            </if>
+            <if test="workOrder != null and workOrder != ''">
+                AND WorkOrder LIKE CONCAT('%', #{workOrder}, '%')
+            </if>
+            <if test="terminalName != null and terminalName != ''">
+                AND TerminalName LIKE CONCAT('%', #{terminalName}, '%')
+            </if>
+            <if test="productName != null and productName != ''">
+                AND ProductName LIKE CONCAT('%', #{productName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND Status = #{status}
+            </if>
+            <if test="createStartTime != null">
+                AND CreateTime &gt;= #{createStartTime}
+            </if>
+            <if test="createEndTime != null">
+                AND CreateTime &lt;= #{createEndTime}
+            </if>
+            <if test="operationTimeStart != null">
+                AND OperationTime &gt;= #{operationTimeStart}
+            </if>
+            <if test="operationTimeEnd != null">
+                AND OperationTime &lt;= #{operationTimeEnd}
+            </if>
+        </where>
+        order by CreateTime desc
+    </select>
+
+</mapper>

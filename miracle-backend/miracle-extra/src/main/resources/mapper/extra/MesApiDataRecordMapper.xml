@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesApiDataRecordMapper">
+
+    <resultMap type="com.miracle.extra.domain.MesApiDataRecord" id="MesApiDataRecordResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="deviceId" column="DeviceId" />
+        <result property="deviceType" column="DeviceType" />
+        <result property="productModel" column="ProductModel" />
+        <result property="workOrder" column="WorkOrder" />
+        <result property="workResults" column="WorkResults" />
+        <result property="defectReason" column="DefectReason" />
+        <result property="workDate" column="WorkDate" />
+        <result property="createTime" column="CreateTime" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.MesApiDataRecord$MesApiDataBarCodeDetail" id="MesApiDataBarCodeDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="barCode" column="BarCode" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.MesApiDataRecord$MesApiDataMaterialBatchDetail" id="MesApiDataMaterialBatchDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="materialBatch" column="MaterialBatch" />
+        <result property="materialModel" column="MaterialModel" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.MesApiDataRecord$MesApiDataMaterialBarCodeDetail" id="MesApiDataMaterialBarCodeDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="materialBarCode" column="MaterialBarCode" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.MesApiDataRecord$MesApiDataInfoDetail" id="MesApiDataInfoDetailResult">
+        <id property="id" column="Id" />
+        <result property="dataTrackId" column="DataTrackId" />
+        <result property="nodeIndex" column="NodeIndex" />
+        <result property="dataNo" column="DataNo" />
+        <result property="dataName" column="DataName" />
+        <result property="dataValue" column="DataValue" />
+    </resultMap>
+
+    <sql id="selectMesApiDataRecordVo">
+        select Id, DataTrackId, DeviceId, DeviceType, ProductModel, WorkOrder,
+               WorkResults, DefectReason, WorkDate, CreateTime
+        from MesApiDataRecord
+    </sql>
+
+    <select id="selectMesApiDataRecordList" parameterType="com.miracle.extra.domain.MesApiDataRecord" resultMap="MesApiDataRecordResult">
+        <include refid="selectMesApiDataRecordVo" />
+        <where>
+            <if test="deviceId != null and deviceId != ''">AND DeviceId LIKE CONCAT('%', #{deviceId}, '%')</if>
+            <if test="deviceType != null and deviceType != ''">AND DeviceType LIKE CONCAT('%', #{deviceType}, '%')</if>
+            <if test="productModel != null and productModel != ''">AND ProductModel LIKE CONCAT('%', #{productModel}, '%')</if>
+            <if test="workOrder != null and workOrder != ''">AND WorkOrder LIKE CONCAT('%', #{workOrder}, '%')</if>
+            <if test="workResults != null and workResults != ''">AND WorkResults = #{workResults}</if>
+            <if test="searchBarCode != null and searchBarCode != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM MesApiDataBarCodeDetail WHERE BarCode LIKE CONCAT('%', #{searchBarCode}, '%'))
+            </if>
+            <if test="searchMaterialBatch != null and searchMaterialBatch != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM MesApiDataMaterialBatchDetail WHERE MaterialBatch LIKE CONCAT('%', #{searchMaterialBatch}, '%'))
+            </if>
+            <if test="searchMaterialBarCode != null and searchMaterialBarCode != ''">
+                AND DataTrackId IN (SELECT DataTrackId FROM MesApiDataMaterialBarCodeDetail WHERE MaterialBarCode LIKE CONCAT('%', #{searchMaterialBarCode}, '%'))
+            </if>
+            <if test="workDateStart != null">AND WorkDate &gt;= #{workDateStart}</if>
+            <if test="workDateEnd != null">AND WorkDate &lt;= #{workDateEnd}</if>
+        </where>
+        order by WorkDate desc
+    </select>
+
+    <select id="selectBarCodeListByDataTrackId" parameterType="string" resultMap="MesApiDataBarCodeDetailResult">
+        SELECT Id, DataTrackId, BarCode 
+        FROM MesApiDataBarCodeDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectMaterialBatchListByDataTrackId" parameterType="string" resultMap="MesApiDataMaterialBatchDetailResult">
+        SELECT Id, DataTrackId, MaterialBatch,MaterialModel
+        FROM MesApiDataMaterialBatchDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectMaterialBarCodeListByDataTrackId" parameterType="string" resultMap="MesApiDataMaterialBarCodeDetailResult">
+        SELECT Id, DataTrackId, MaterialBarCode 
+        FROM MesApiDataMaterialBarCodeDetail 
+        WHERE DataTrackId = #{dataTrackId}
+    </select>
+
+    <select id="selectDataInfoListByDataTrackId" parameterType="string" resultMap="MesApiDataInfoDetailResult">
+        SELECT Id, DataTrackId, NodeIndex, DataNo, DataName, DataValue 
+        FROM MesApiDataInfoDetail 
+        WHERE DataTrackId = #{dataTrackId}
+        ORDER BY NodeIndex
+    </select>
+
+</mapper>

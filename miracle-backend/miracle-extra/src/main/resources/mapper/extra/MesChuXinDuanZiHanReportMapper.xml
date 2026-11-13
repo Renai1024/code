@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesChuXinDuanZiHanReportMapper">
+
+    <resultMap type="MesChuXinDuanZiHanReport" id="MesChuXinDuanZiHanReportResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="createtime"/>
+        <result property="batchNo" column="batchno"/>
+        <result property="productionTime" column="productiontime"/>
+        <result property="productCode" column="productcode"/>
+        <result property="weldingTime" column="weldingtime"/>
+        <result property="weldingAmplitude" column="weldingamplitude"/>
+        <result property="weldingPressure" column="weldingpressure"/>
+        <result property="weldingEnergy" column="weldingenergy"/>
+        <result property="weldingPower" column="weldingpower"/>
+        <result property="preloadingHeight" column="preloadingheight"/>
+        <result property="postWeldingHeight" column="postweldingheight"/>
+        <result property="weldingDepth" column="weldingdepth"/>
+        <result property="operationMode" column="operationmode"/>
+        <result property="workingMode" column="workingmode"/>
+        <result property="timeUpperLimit" column="timeupperlimit"/>
+        <result property="timeLowerLimit" column="timelowerlimit"/>
+        <result property="powerUpperLimit" column="powerupperlimit"/>
+        <result property="powerLowerLimit" column="powerlowerlimit"/>
+        <result property="energyUpperLimit" column="energyupperlimit"/>
+        <result property="energyLowerLimit" column="energylowerlimit"/>
+        <result property="preloadingUpperLimit" column="preloadingupperlimit"/>
+        <result property="preloadingLowerLimit" column="preloadinglowerlimit"/>
+        <result property="postWeldingUpperLimit" column="postweldingupperlimit"/>
+        <result property="postWeldingLowerLimit" column="postweldinglowerlimit"/>
+        <result property="hornCode" column="horncode"/>
+        <result property="anvilCode" column="anvilcode"/>
+        <result property="holderCode" column="holdercode"/>
+        <result property="hornAUseCount" column="hornausecount"/>
+        <result property="hornBUseCount" column="hornbusecount"/>
+        <result property="anvilUseCount" column="anvilusecount"/>
+        <result property="holderUseCount" column="holderusecount"/>
+        <result property="alarmStatus" column="alarmstatus"/>
+        <result property="equipmentNumber" column="equipmentnumber"/>
+    </resultMap>
+
+    <sql id="selectMesChuXinDuanZiHanReportVo">
+        SELECT
+        Id AS id,
+        CreateTime AS createtime,
+        batchNo AS batchno,
+        productionTime AS productiontime,
+        productCode AS productcode,
+        weldingTime AS weldingtime,
+        weldingAmplitude AS weldingamplitude,
+        weldingPressure AS weldingpressure,
+        weldingEnergy AS weldingenergy,
+        weldingPower AS weldingpower,
+        preloadingHeight AS preloadingheight,
+        postWeldingHeight AS postweldingheight,
+        weldingDepth AS weldingdepth,
+        operationMode AS operationmode,
+        workingMode AS workingmode,
+        timeUpperLimit AS timeupperlimit,
+        timeLowerLimit AS timelowerlimit,
+        powerUpperLimit AS powerupperlimit,
+        powerLowerLimit AS powerlowerlimit,
+        energyUpperLimit AS energyupperlimit,
+        energyLowerLimit AS energylowerlimit,
+        preloadingUpperLimit AS preloadingupperlimit,
+        preloadingLowerLimit AS preloadinglowerlimit,
+        postWeldingUpperLimit AS postweldingupperlimit,
+        postWeldingLowerLimit AS postweldinglowerlimit,
+        hornCode AS horncode,
+        anvilCode AS anvilcode,
+        holderCode AS holdercode,
+        hornAUseCount AS hornausecount,
+        hornBUseCount AS hornbusecount,
+        anvilUseCount AS anvilusecount,
+        holderUseCount AS holderusecount,
+        alarmStatus AS alarmstatus,
+        equipmentNumber AS equipmentnumber
+        FROM dbo.ChuXinDuanZiHan
+    </sql>
+
+    <select id="selectMesChuXinDuanZiHanReportList" parameterType="MesChuXinDuanZiHanReport" resultMap="MesChuXinDuanZiHanReportResult">
+        <include refid="selectMesChuXinDuanZiHanReportVo"/>
+        <where>
+            <if test="batchNo != null and batchNo != ''">
+                AND batchNo LIKE CONCAT('%', #{batchNo}, '%')
+            </if>
+            <if test="productCode != null and productCode != ''">
+                AND productCode LIKE CONCAT('%', #{productCode}, '%')
+            </if>
+            <if test="equipmentNumber != null and equipmentNumber != ''">
+                AND equipmentNumber LIKE CONCAT('%', #{equipmentNumber}, '%')
+            </if>
+            <if test="alarmStatus != null and alarmStatus != ''">
+                AND alarmStatus LIKE CONCAT('%', #{alarmStatus}, '%')
+            </if>
+            <if test="createStartTime != null">
+                AND CreateTime &gt;= #{createStartTime}
+            </if>
+            <if test="createEndTime != null">
+                AND CreateTime &lt;= #{createEndTime}
+            </if>
+        </where>
+        order by CreateTime desc
+    </select>
+</mapper>

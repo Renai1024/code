@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.ProductInfoMapper">
+
+    <resultMap type="com.miracle.extra.domain.ProductInfo" id="ProductInfoResult">
+        <id property="id" column="Id" />
+        <result property="customerFlag" column="CustomerFlag" />
+        <result property="customerProductCode" column="CustomerProductCode" />
+        <result property="productCode" column="ProductCode" />
+        <result property="productName" column="ProductName" />
+        <result property="specification" column="Specification" />
+        <result property="productVersion" column="ProductVersion" />
+        <result property="ddFactoryFlag" column="DDFactoryFlag" />
+        <result property="barcodeRule" column="BarcodeRule" />
+        <result property="remark" column="Remark" />
+        <result property="activeStatus" column="ActiveStatus" />
+        <result property="createTime" column="CreateTime" />
+        <result property="createBy" column="CreateBy" />
+        <result property="modifyTime" column="ModifyTime" />
+        <result property="modifyBy" column="ModifyBy" />
+        <result property="deleted" column="Deleted" />
+    </resultMap>
+
+    <sql id="selectProductInfoVo">
+        select Id, CustomerFlag, CustomerProductCode, ProductCode, ProductName,
+               Specification, ProductVersion, DDFactoryFlag, BarcodeRule, Remark,
+               ActiveStatus, CreateTime, CreateBy, ModifyTime, ModifyBy, Deleted
+        from Products
+    </sql>
+
+    <select id="selectProductByCode" parameterType="string" resultMap="ProductInfoResult">
+        <include refid="selectProductInfoVo" />
+        where ProductCode = #{productCode} AND Deleted = 0
+    </select>
+
+    <select id="selectProductList" parameterType="com.miracle.extra.domain.ProductInfo" resultMap="ProductInfoResult">
+        <include refid="selectProductInfoVo" />
+        <where>
+            <if test="customerFlag != null and customerFlag != ''">AND CustomerFlag LIKE '%' + #{customerFlag} + '%'</if>
+            <if test="customerProductCode != null and customerProductCode != ''">AND CustomerProductCode LIKE '%' + #{customerProductCode} + '%'</if>
+            <if test="productCode != null and productCode != ''">AND ProductCode LIKE '%' + #{productCode} + '%'</if>
+            <if test="productName != null and productName != ''">AND ProductName LIKE '%' + #{productName} + '%'</if>
+            <if test="activeStatus != null">AND ActiveStatus = #{activeStatus}</if>
+            AND Deleted = 0
+        </where>
+        order by CreateTime desc
+    </select>
+
+    <select id="selectActiveProducts" resultMap="ProductInfoResult">
+        <include refid="selectProductInfoVo" />
+        where ActiveStatus = 1 AND Deleted = 0
+        order by ProductCode
+    </select>
+
+</mapper>

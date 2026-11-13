@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesMuPai3DataReportMapper">
+
+    <resultMap type="MesMuPai3DataReport" id="MesMuPai3DataReportResult">
+        <result property="id" column="id"/>
+        <result property="customerFlag" column="customerflag"/>
+        <result property="materialCode" column="materialcode"/>
+        <result property="checkStartTime" column="checkstarttime"/>
+        <result property="checkEndTime" column="checkendtime"/>
+        <result property="resultStr" column="resultstr"/>
+        <result property="stockInBarCode" column="stockinbarcode"/>
+        <result property="myField1" column="myfield1"/>
+        <result property="myField2" column="myfield2"/>
+        <result property="myField3" column="myfield3"/>
+    </resultMap>
+
+    <sql id="selectMesMuPai3DataReportVo">
+        SELECT
+        Id AS id,
+        CustomerFlag AS customerflag,
+        MaterialCode AS materialcode,
+        CheckStartTime AS checkstarttime,
+        CheckEndTime AS checkendtime,
+        ResultStr AS resultstr,
+        StockInBarCode AS stockinbarcode,
+        MyField1 AS myfield1,
+        MyField2 AS myfield2,
+        MyField3 AS myfield3
+        FROM dbo.MuPai3Data
+    </sql>
+
+    <select id="selectMesMuPai3DataReportList" parameterType="MesMuPai3DataReport" resultMap="MesMuPai3DataReportResult">
+        <include refid="selectMesMuPai3DataReportVo"/>
+        <where>
+            <if test="customerFlag != null and customerFlag != ''">
+                AND CustomerFlag  = #{customerFlag}
+            </if>
+            <if test="barCodeQuery != null and barCodeQuery != ''">
+                AND StockInBarCode LIKE CONCAT('%', #{barCodeQuery}, '%')
+            </if>
+            <if test="materialCodeQuery != null and materialCodeQuery != ''">
+                AND MaterialCode LIKE CONCAT('%', #{materialCodeQuery}, '%')
+            </if>
+            <if test="machineNoQuery != null and machineNoQuery != ''">
+                AND MyField1 LIKE CONCAT('%', #{machineNoQuery}, '%')
+            </if>
+            <if test="startTimeStart != null">
+                AND CheckStartTime &gt;= #{startTimeStart}
+            </if>
+            <if test="startTimeEnd != null">
+                AND CheckStartTime &lt;= #{startTimeEnd}
+            </if>
+        </where>
+        order by CheckStartTime desc
+    </select>
+</mapper>

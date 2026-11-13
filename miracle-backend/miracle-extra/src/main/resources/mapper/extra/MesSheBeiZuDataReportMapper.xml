@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesSheBeiZuDataReportMapper">
+
+    <resultMap type="MesSheBeiZuDataReport" id="MesSheBeiZuDataReportResult">
+        <result property="id" column="id"/>
+        <result property="customerFlag" column="customerflag"/>
+        <result property="materialCode" column="materialcode"/>
+        <result property="checkStartTime" column="checkstarttime"/>
+        <result property="checkEndTime" column="checkendtime"/>
+        <result property="resultStr" column="resultstr"/>
+        <result property="escapeStr" column="escapestr"/>
+        <result property="barCode" column="barcode"/>
+        <result property="myField1" column="myfield1"/>
+        <result property="myField2" column="myfield2"/>
+        <result property="myField3" column="myfield3"/>
+        <result property="myField4" column="myfield4"/>
+        <result property="myField5" column="myfield5"/>
+        <result property="myField6" column="myfield6"/>
+    </resultMap>
+
+    <sql id="selectMesSheBeiZuDataReportVo">
+        SELECT
+        Id AS id,
+        CustomerFlag AS customerflag,
+        MaterialCode AS materialcode,
+        CheckStartTime AS checkstarttime,
+        CheckEndTime AS checkendtime,
+        ResultStr AS resultstr,
+        EscapeStr AS escapestr,
+        BarCode AS barcode,
+        MyField1 AS myfield1,
+        MyField2 AS myfield2,
+        MyField3 AS myfield3,
+        MyField4 AS myfield4,
+        MyField5 AS myfield5,
+        MyField6 AS myfield6
+        FROM dbo.SheBeiZuData
+    </sql>
+
+    <select id="selectMesSheBeiZuDataReportList" parameterType="MesSheBeiZuDataReport" resultMap="MesSheBeiZuDataReportResult">
+        <include refid="selectMesSheBeiZuDataReportVo"/>
+        <where>
+            <if test="barCodeQuery != null and barCodeQuery != ''">
+                AND BarCode LIKE CONCAT('%', #{barCodeQuery}, '%')
+            </if>
+            <if test="materialCodeQuery != null and materialCodeQuery != ''">
+                AND MaterialCode LIKE CONCAT('%', #{materialCodeQuery}, '%')
+            </if>
+            <if test="productCodeQuery != null and productCodeQuery != ''">
+                AND MyField1 LIKE CONCAT('%', #{productCodeQuery}, '%')
+            </if>
+            <if test="operatorQuery != null and operatorQuery != ''">
+                AND MyField4 LIKE CONCAT('%', #{operatorQuery}, '%')
+            </if>
+            <if test="startTimeStart != null">
+                AND CheckStartTime &gt;= #{startTimeStart}
+            </if>
+            <if test="startTimeEnd != null">
+                AND CheckStartTime &lt;= #{startTimeEnd}
+            </if>
+        </where>
+        order by CheckStartTime desc
+    </select>
+</mapper>

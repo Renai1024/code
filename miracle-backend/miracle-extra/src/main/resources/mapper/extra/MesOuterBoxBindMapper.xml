@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesOuterBoxBindMapper">
+
+    <resultMap type="com.miracle.extra.domain.MesOuterBoxBindRecord" id="MesOuterBoxBindResult">
+        <result property="uuid" column="uuid"/>
+        <result property="outerBoxBarcode" column="outer_box_barcode"/>
+        <result property="productBarcode" column="product_barcode"/>
+        <result property="bindSn" column="bind_sn"/>
+        <result property="bindTime" column="bind_time"/>
+        <result property="bindBy" column="bind_by"/>
+    </resultMap>
+
+    <sql id="selectMesOuterBoxBindRecordVo">
+        select uuid, outer_box_barcode, product_barcode, bind_sn, bind_time, bind_by
+        from mes_outer_box_bind_record
+    </sql>
+
+    <select id="selectMesOuterBoxBindRecordByOuterBoxBarcode" parameterType="string" resultMap="MesOuterBoxBindResult">
+        <include refid="selectMesOuterBoxBindRecordVo"/>
+        where outer_box_barcode = #{outerBoxBarcode}
+        order by bind_sn asc
+    </select>
+    
+    <select id="selectProductsByOuterBoxBarcode" parameterType="string" resultType="string">
+        select product_barcode from mes_outer_box_bind_record
+        where outer_box_barcode = #{outerBoxBarcode}
+        order by bind_sn asc
+    </select>
+
+    <select id="selectMesOuterBoxBindRecordByProductBarcode" parameterType="string" resultMap="MesOuterBoxBindResult">
+        <include refid="selectMesOuterBoxBindRecordVo"/>
+        where product_barcode = #{productBarcode}
+        order by bind_time desc
+    </select>
+
+    <select id="selectMesOuterBoxBindRecordList" resultMap="MesOuterBoxBindResult">
+        <include refid="selectMesOuterBoxBindRecordVo"/>
+        <where>
+            <if test="outerBoxBarcode != null and outerBoxBarcode != ''">
+                and outer_box_barcode = #{outerBoxBarcode}
+            </if>
+            <if test="productBarcode != null and productBarcode != ''">
+                and product_barcode = #{productBarcode}
+            </if>
+            <if test="bindBy != null and bindBy != ''">
+                and bind_by = #{bindBy}
+            </if>
+            <if test="bindStartTime != null">
+                and bind_time &gt;= #{bindStartTime}
+            </if>
+            <if test="bindEndTime != null">
+                and bind_time &lt;=#{bindEndTime}
+            </if>
+        </where>
+        order by bind_time desc, outer_box_barcode asc, bind_sn asc
+    </select>
+
+    <select id="selectDistinctOuterBoxBarcodes" resultType="string">
+        select distinct outer_box_barcode
+        from mes_outer_box_bind_record
+        <where>
+            <if test="outerBoxBarcode != null and outerBoxBarcode != ''">
+                and outer_box_barcode = #{outerBoxBarcode}
+            </if>
+            <if test="bindBy != null and bindBy != ''">
+                and bind_by = #{bindBy}
+            </if>
+        </where>
+        order by outer_box_barcode desc
+    </select>
+    
+    <select id="selectMesOuterBoxBindRecordGroupList" resultType="map">
+        select 
+            outer_box_barcode as outerBoxBarcode,
+            min(product_barcode) as firstProductBarcode,
+            count(*) as productCount,
+            max(bind_time) as bindTime,
+            min(bind_by) as bindBy
+        from mes_outer_box_bind_record
+        <where>
+            <if test="outerBoxBarcode != null and outerBoxBarcode != ''">
+                and outer_box_barcode = #{outerBoxBarcode}
+            </if>
+            <if test="bindBy != null and bindBy != ''">
+                and bind_by = #{bindBy}
+            </if>
+        </where>
+        group by outer_box_barcode
+        order by bindTime desc
+    </select>
+
+    <insert id="insertMesOuterBoxBindRecord">
+        insert into mes_outer_box_bind_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">uuid,</if>
+            <if test="outerBoxBarcode != null">outer_box_barcode,</if>
+            <if test="productBarcode != null">product_barcode,</if>
+            <if test="bindSn != null">bind_sn,</if>
+            <if test="bindTime != null">bind_time,</if>
+            <if test="bindBy != null">bind_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">#{uuid},</if>
+            <if test="outerBoxBarcode != null">#{outerBoxBarcode},</if>
+            <if test="productBarcode != null">#{productBarcode},</if>
+            <if test="bindSn != null">#{bindSn},</if>
+            <if test="bindTime != null">#{bindTime},</if>
+            <if test="bindBy != null">#{bindBy},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertMesOuterBoxBindRecord">
+        insert into mes_outer_box_bind_record (uuid, outer_box_barcode, product_barcode, bind_sn, bind_time, bind_by)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.uuid}, #{item.outerBoxBarcode}, #{item.productBarcode}, #{item.bindSn}, #{item.bindTime}, #{item.bindBy})
+        </foreach>
+    </insert>
+
+    <delete id="deleteMesOuterBoxBindRecordByOuterBoxBarcode">
+        delete from mes_outer_box_bind_record where outer_box_barcode = #{outerBoxBarcode}
+    </delete>
+
+</mapper>

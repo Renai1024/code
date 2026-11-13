@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesZCDaoTongGaoYaCeShiMapper">
+
+    <resultMap type="MesZCDaoTongGaoYaCeShi" id="MesZCDaoTongGaoYaCeShiResult">
+        <result property="id"    column="id"    />
+        <result property="stationId"    column="stationId"    />
+        <result property="machineId"    column="machineId"    />
+        <result property="sn"    column="sn"    />
+        <result property="sn2"    column="sn2"    />
+        <result property="pn"    column="pn"    />
+        <result property="orderId"    column="orderId"    />
+        <result property="batchId"    column="batchId"    />
+        <result property="operator"    column="operator"    />
+        <result property="result"    column="result"    />
+        <result property="startTime"    column="startTime"    />
+        <result property="endTime"    column="endTime"    />
+        <result property="dataResult"    column="dataResult"    />
+        <result property="createdTime"    column="createdTime"    />
+    </resultMap>
+
+    <sql id="selectMesZCDaoTongGaoYaCeShiVo">
+        select id, stationId, machineId, sn, sn2, pn, orderId, batchId,operator,result,startTime,endTime,dataResult,createdTime from dbo.ZCDaoTongGaoYaCeShi
+    </sql>
+
+    <select id="selectMesZCDaoTongGaoYaCeShiList" parameterType="MesZCDaoTongGaoYaCeShi" resultMap="MesZCDaoTongGaoYaCeShiResult">
+        <include refid="selectMesZCDaoTongGaoYaCeShiVo"/>
+        <where>
+            <if test="sn != null  and sn != ''"> and sn like concat('%', #{sn}, '%') or sn2 like concat('%', #{sn}, '%')</if>
+            <if test="machineId != null  and machineId != ''"> and machineId like concat('%', #{machineId}, '%')</if>
+            <if test="operator != null  and operator != ''"> and operator like concat('%', #{operator}, '%')</if>
+            <if test="result != null  and result != ''"> and result like concat('%', #{result}, '%')</if>
+            <if test="testStartTime != null "> and startTime &gt; #{testStartTime}</if>
+            <if test="testEndTime != null "> and startTime &lt; DATEADD(day, 1, #{testEndTime})</if>
+        </where>
+        order by startTime desc
+    </select>
+
+</mapper>

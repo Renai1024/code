@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.CustomerOuterBoxRuleMapper">
+
+    <resultMap type="com.miracle.extra.domain.CustomerOuterBoxRule" id="CustomerOuterBoxRuleResult">
+        <id property="id" column="id"/>
+        <result property="customerCode" column="customer_code"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="customerFlag" column="customer_flag"/>
+        <result property="fieldName" column="field_name"/>
+        <result property="fieldLabel" column="field_label"/>
+        <result property="labelRegex" column="label_regex"/>
+        <result property="extractGroup" column="extract_group"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="activeStatus" column="active_status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="modifyTime" column="modify_time"/>
+        <result property="modifyBy" column="modify_by"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="selectCustomerOuterBoxRuleVo">
+        select id, customer_code, customer_name, customer_flag, field_name, field_label,
+               label_regex, extract_group, sort_order,
+               active_status, remark, create_time, create_by, modify_time, modify_by, deleted
+        from customer_outer_box_rule
+    </sql>
+
+    <select id="selectCustomerOuterBoxRuleById" parameterType="Long" resultMap="CustomerOuterBoxRuleResult">
+        <include refid="selectCustomerOuterBoxRuleVo"/>
+        where id = #{id} and deleted = 0
+    </select>
+
+    <select id="selectByCustomerCode" parameterType="string" resultMap="CustomerOuterBoxRuleResult">
+        <include refid="selectCustomerOuterBoxRuleVo"/>
+        where customer_code = #{customerCode} and deleted = 0
+        order by sort_order asc
+    </select>
+
+    <select id="selectCustomerOuterBoxRuleList" parameterType="com.miracle.extra.domain.CustomerOuterBoxRule" resultMap="CustomerOuterBoxRuleResult">
+        <include refid="selectCustomerOuterBoxRuleVo"/>
+        <where>
+            deleted = 0
+            <if test="customerCode != null and customerCode != ''">
+                and customer_code like concat('%', #{customerCode}, '%')
+            </if>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="customerFlag != null and customerFlag != ''">
+                and customer_flag = #{customerFlag}
+            </if>
+            <if test="fieldName != null and fieldName != ''">
+                and field_name like concat('%', #{fieldName}, '%')
+            </if>
+            <if test="activeStatus != null">
+                and active_status = #{activeStatus}
+            </if>
+        </where>
+        order by customer_code asc, sort_order asc
+    </select>
+
+    <select id="selectActiveRules" resultMap="CustomerOuterBoxRuleResult">
+        <include refid="selectCustomerOuterBoxRuleVo"/>
+        where active_status = 1 and deleted = 0
+        order by customer_code asc, sort_order asc
+    </select>
+
+    <insert id="insertCustomerOuterBoxRule" parameterType="com.miracle.extra.domain.CustomerOuterBoxRule" useGeneratedKeys="true" keyProperty="id">
+        insert into customer_outer_box_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerCode != null">customer_code,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="customerFlag != null">customer_flag,</if>
+            <if test="fieldName != null">field_name,</if>
+            <if test="fieldLabel != null">field_label,</if>
+            <if test="labelRegex != null">label_regex,</if>
+            <if test="extractGroup != null">extract_group,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="activeStatus != null">active_status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="deleted != null">deleted,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerCode != null">#{customerCode},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="customerFlag != null">#{customerFlag},</if>
+            <if test="fieldName != null">#{fieldName},</if>
+            <if test="fieldLabel != null">#{fieldLabel},</if>
+            <if test="labelRegex != null">#{labelRegex},</if>
+            <if test="extractGroup != null">#{extractGroup},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="activeStatus != null">#{activeStatus},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="deleted != null">#{deleted},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCustomerOuterBoxRule" parameterType="com.miracle.extra.domain.CustomerOuterBoxRule">
+        update customer_outer_box_rule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerCode != null">customer_code = #{customerCode},</if>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="customerFlag != null">customer_flag = #{customerFlag},</if>
+            <if test="fieldName != null">field_name = #{fieldName},</if>
+            <if test="fieldLabel != null">field_label = #{fieldLabel},</if>
+            <if test="labelRegex != null">label_regex = #{labelRegex},</if>
+            <if test="extractGroup != null">extract_group = #{extractGroup},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="activeStatus != null">active_status = #{activeStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="modifyBy != null">modify_by = #{modifyBy},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteCustomerOuterBoxRuleById" parameterType="Long">
+        update customer_outer_box_rule set deleted = 1, modify_time = now() where id = #{id}
+    </update>
+
+    <update id="deleteCustomerOuterBoxRuleByIds" parameterType="Long">
+        update customer_outer_box_rule set deleted = 1, modify_time = now() where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

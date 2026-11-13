@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesLWSQiMiXingReportMapper">
+
+    <resultMap type="MesLWSQiMiXingReport" id="MesLWSQiMiXingReportResult">
+        <result property="id"    column="id"    />
+        <result property="chuangjianshijian"    column="chuangjianshijian"    />
+        <result property="jianceriqi"    column="jianceriqi"    />
+        <result property="gongwei"    column="gongwei"    />
+        <result property="tiaoma"    column="tiaoma"    />
+        <result property="chongqishijian"    column="chongqishijian"    />
+        <result property="wenyashijian"    column="wenyashijian"    />
+        <result property="ceshishijian"    column="ceshishijian"    />
+        <result property="ceshiyali"    column="ceshiyali"    />
+        <result property="xielouzhi"    column="xielouzhi"    />
+        <result property="jieguo"    column="jieguo"    />
+    </resultMap>
+
+    <sql id="selectMesLWSQiMiXingReportVo">
+        select id, chuangjianshijian, jianceriqi, gongwei, tiaoma, chongqishijian, wenyashijian, ceshishijian,ceshiyali,xielouzhi,jieguo from dbo.LWSQiMiXing
+    </sql>
+
+    <select id="selectMesLWSQiMiXingReportList" parameterType="MesLWSQiMiXingReport" resultMap="MesLWSQiMiXingReportResult">
+        <include refid="selectMesLWSQiMiXingReportVo"/>
+        <where>
+            <if test="tiaoma != null  and tiaoma != ''"> and tiaoma like concat('%', #{tiaoma}, '%')</if>
+            <if test="gongwei != null  and gongwei != ''"> and gongwei like concat('%', #{gongwei}, '%')</if>
+            <if test="testStartTime != null "> and jianceriqi &gt; #{testStartTime}</if>
+            <if test="testEndTime != null "> and jianceriqi &lt; DATEADD(day, 1, #{testEndTime})</if>
+        </where>
+        order by jianceriqi desc
+    </select>
+
+</mapper>

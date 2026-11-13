@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesLiErLiChaBaLiReportMapper">
+
+    <resultMap type="MesLiErLiChaBaLiReport" id="MesLiErLiChaBaLiReportResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="createtime"/>
+        <result property="productType" column="producttype"/>
+        <result property="operationTime" column="operationtime"/>
+        <result property="output" column="output"/>
+        <result property="tensionMaxValue" column="tensionmaxvalue"/>
+        <result property="tensionUpperLimit" column="tensionupperlimit"/>
+        <result property="tensionLowerLimit" column="tensionlowerlimit"/>
+        <result property="qualified" column="qualified"/>
+        <result property="workOrder" column="workorder"/>
+    </resultMap>
+
+    <sql id="selectMesLiErLiChaBaLiReportVo">
+        SELECT
+            Id AS id,
+            CreateTime AS createtime,
+            ProductType AS producttype,
+            OperationTime AS operationtime,
+            "Output" AS "output",
+            TensionMaxValue AS tensionmaxvalue,
+            TensionUpperLimit AS tensionupperlimit,
+            TensionLowerLimit AS tensionlowerlimit,
+            Qualified AS qualified,
+            WorkOrder AS workorder
+        FROM dbo.LiErLiChaBaLi
+    </sql>
+
+    <select id="selectMesLiErLiChaBaLiReportList" parameterType="MesLiErLiChaBaLiReport" resultMap="MesLiErLiChaBaLiReportResult">
+        <include refid="selectMesLiErLiChaBaLiReportVo"/>
+        <where>
+            <if test="productType != null and productType != ''">
+                AND ProductType LIKE CONCAT('%', #{productType}, '%')
+            </if>
+            <if test="workOrder != null and workOrder != ''">
+                AND WorkOrder LIKE CONCAT('%', #{workOrder}, '%')
+            </if>
+            <if test="qualified != null">
+                AND Qualified = #{qualified}
+            </if>
+            <if test="createStartTime != null">
+                AND CreateTime &gt;= #{createStartTime}
+            </if>
+            <if test="createEndTime != null">
+                AND CreateTime &lt;= #{createEndTime}
+            </if>
+            <if test="operationTimeStart != null">
+                AND OperationTime &gt;= #{operationTimeStart}
+            </if>
+            <if test="operationTimeEnd != null">
+                AND OperationTime &lt;= #{operationTimeEnd}
+            </if>
+        </where>
+        order by CreateTime desc
+    </select>
+
+</mapper>

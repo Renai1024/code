@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 单个有效内箱周期只产生一行，当前外箱和有效 SN 参与筛选。 -->
+<mapper namespace="com.miracle.extra.mapper.TycoPackingReportMapper">
+    <resultMap id="row" type="com.miracle.extra.domain.TycoPackingReport$Row"
+               extends="com.miracle.extra.mapper.TycoPackingMapper.session">
+        <result property="outerCode" column="outer_code"/>
+        <result property="outerTraceNo" column="outer_trace_no"/>
+        <result property="outerQuantity" column="outer_quantity"/>
+        <result property="bindingActive" column="binding_active"/>
+        <result property="boundAt" column="bound_at"/>
+    </resultMap>
+    <sql id="completedInner">
+        s.kind='INNER' AND s.is_active=1 AND s.status IN ('PACKED','BOUND')
+    </sql>
+    <!-- 列表、查询、详情和导出都只取有效外箱关联。 -->
+    <sql id="activeOuterBinding">
+        b.is_active=1 AND o.kind='OUTER' AND o.is_active=1 AND o.status='BOUND'
+    </sql>
+    <sql id="boxQuery">
+        SELECT s.*, latest.outer_code, latest.outer_trace_no, latest.outer_quantity,
+               latest.binding_active, latest.bound_at
+        FROM dbo.tyco_packing_session s
+        OUTER APPLY (
+            SELECT TOP(1) o.raw_code AS outer_code, o.trace_no AS outer_trace_no,
+                   o.quantity AS outer_quantity, b.is_active AS binding_active,
+                   b.bound_at
+            FROM dbo.tyco_packing_binding b
+            JOIN dbo.tyco_packing_session o ON o.id=b.outer_id
+            WHERE b.inner_id=s.id AND <include refid="activeOuterBinding"/>
+            ORDER BY b.bound_at DESC,b.id DESC
+        ) latest
+    </sql>
+    <select id="list" resultMap="row">
+        <include refid="boxQuery"/>
+        WHERE <include refid="completedInner"/>
+        <if test="part != null and part != ''">AND CHARINDEX(#{part},s.part)&gt;0</if>
+        <if test="innerCode != null and innerCode != ''">AND CHARINDEX(#{innerCode},s.raw_code)&gt;0</if>
+        <if test="status != null and status != ''">AND s.status=#{status}</if>
+        <if test="tailBox != null">AND s.is_tail_box=#{tailBox}</if>
+        <if test="beginDate != null">AND s.reviewed_at&gt;=#{beginDate}</if>
+        <if test="endDate != null">AND s.reviewed_at&lt;DATEADD(DAY,1,CONVERT(date,#{endDate}))</if>
+        <!-- 按主表显示的当前外箱码筛选，解绑历史不会影响分页和总数。 -->
+        <if test="outerCode != null and outerCode != ''">
+            AND CHARINDEX(#{outerCode},latest.outer_code)&gt;0
+        </if>
+        <if test="productCode != null and productCode != ''">
+            AND EXISTS (SELECT 1 FROM dbo.tyco_packing_sn n
+                WHERE n.session_id=s.id AND n.is_active=1 AND CHARINDEX(#{productCode},n.product_code)&gt;0)
+        </if>
+        ORDER BY s.reviewed_at DESC,s.id DESC
+    </select>
+    <select id="box" resultMap="row">
+        <include refid="boxQuery"/> WHERE <include refid="completedInner"/> AND s.id=#{id}
+    </select>
+    <select id="scans" resultType="com.miracle.extra.domain.TycoPackingReport$Sn">
+        SELECT id,product_code AS productCode,is_active AS active,scanned_at AS scannedAt
+        FROM dbo.tyco_packing_sn WHERE session_id=#{id} AND is_active=1 ORDER BY id
+    </select>
+    <select id="bindings" resultType="com.miracle.extra.domain.TycoPackingReport$Binding">
+        SELECT b.id,o.raw_code AS outerCode,o.trace_no AS traceNo,o.quantity,
+               b.is_active AS active,b.bound_at AS boundAt
+        FROM dbo.tyco_packing_binding b JOIN dbo.tyco_packing_session o ON o.id=b.outer_id
+        WHERE b.inner_id=#{id} AND <include refid="activeOuterBinding"/>
+        ORDER BY b.bound_at DESC,b.id DESC
+    </select>
+</mapper>

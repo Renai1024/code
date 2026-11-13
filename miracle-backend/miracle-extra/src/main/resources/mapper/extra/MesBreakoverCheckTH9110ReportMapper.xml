@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesBreakoverCheckTH9110ReportMapper">
+
+    <resultMap type="MesBreakoverCheckTH9110Report" id="MesBreakoverCheckTH9110ReportResult">
+        <result property="id" column="id"/>
+        <result property="customerFlag" column="customerflag"/>
+        <result property="materialCode" column="materialcode"/>
+        <result property="custMaterialCode" column="custmaterialcode"/>
+        <result property="oldMaterialCode" column="oldmaterialcode"/>
+        <result property="materialName" column="materialname"/>
+        <result property="productionOrder" column="productionorder"/>
+        <result property="checkTime" column="checktime"/>
+        <result property="barCode" column="barcode"/>
+        <result property="sectionResultStr" column="sectionresultstr"/>
+        <result property="testStep" column="teststep"/>
+        <result property="testProject" column="testproject"/>
+        <result property="testVoltage" column="testvoltage"/>
+        <result property="testElectricity" column="testelectricity"/>
+        <result property="judgmentResult" column="judgmentresult"/>
+        <result property="overallResult" column="overallresult"/>
+        <result property="operator" column="operator"/>
+    </resultMap>
+
+    <sql id="selectMesBreakoverCheckTH9110ReportVo">
+        SELECT
+        Id AS id,
+        CustomerFlag AS customerflag,
+        MaterialCode AS materialcode,
+        CustMaterialCode AS custmaterialcode,
+        OldMaterialCode AS oldmaterialcode,
+        MaterialName AS materialname,
+        ProductionOrder AS productionorder,
+        CheckTime AS checktime,
+        BarCode AS barcode,
+        SectionResultStr AS sectionresultstr,
+        TestStep AS teststep,
+        TestProject AS testproject,
+        TestVoltage AS testvoltage,
+        TestElectricity AS testelectricity,
+        JudgmentResult AS judgmentresult,
+        OverallResult AS overallresult,
+        Operator AS operator
+        FROM dbo.BreakoverCheckTH9110
+    </sql>
+
+    <select id="selectMesBreakoverCheckTH9110ReportList" parameterType="MesBreakoverCheckTH9110Report" resultMap="MesBreakoverCheckTH9110ReportResult">
+        <include refid="selectMesBreakoverCheckTH9110ReportVo"/>
+        <where>
+            <if test="barCode != null and barCode != ''">
+                AND BarCode LIKE CONCAT('%', #{barCode}, '%')
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND MaterialCode LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="productionOrder != null and productionOrder != ''">
+                AND ProductionOrder LIKE CONCAT('%', #{productionOrder}, '%')
+            </if>
+            <if test="testProject != null and testProject != ''">
+                AND TestProject LIKE CONCAT('%', #{testProject}, '%')
+            </if>
+            <if test="overallResultFilter != null and overallResultFilter != ''">
+                AND OverallResult = #{overallResultFilter}
+            </if>
+            <if test="checkStartTime != null">
+                AND CheckTime &gt;= #{checkStartTime}
+            </if>
+            <if test="checkEndTime != null">
+                AND CheckTime &lt;= #{checkEndTime}
+            </if>
+        </where>
+        order by CheckTime desc
+    </select>
+</mapper>

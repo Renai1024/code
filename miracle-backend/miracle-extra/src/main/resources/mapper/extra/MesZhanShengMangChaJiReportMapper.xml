@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesZhanShengMangChaJiReportMapper">
+
+    <resultMap type="com.miracle.extra.domain.MesZhanShengMangChaJiReport" id="MesZhanShengMangChaJiReportResult">
+        <id property="id" column="Id" />
+        <result property="createTime" column="CreateTime" />
+        <result property="code" column="Code" />
+        <result property="uploadTime" column="Upload_time" />
+        <result property="macheineCode" column="Macheine_Code" />
+        <result property="datas" column="datas" />
+    </resultMap>
+
+    <sql id="selectMesZhanShengMangChaJiReportVo">
+        select Id, CreateTime, Code, Upload_time, Macheine_Code, datas
+        from ZhanShengMangChaJi
+    </sql>
+
+    <select id="selectMesZhanShengMangChaJiReportList" parameterType="com.miracle.extra.domain.MesZhanShengMangChaJiReport" resultMap="MesZhanShengMangChaJiReportResult">
+        <include refid="selectMesZhanShengMangChaJiReportVo" />
+        <where>
+            <if test="code != null and code != ''">AND Code LIKE CONCAT('%', #{code}, '%')</if>
+            <if test="macheineCode != null and macheineCode != ''">AND Macheine_Code LIKE CONCAT('%', #{macheineCode}, '%')</if>
+            <if test="createStartTime != null">AND Upload_time &gt;= #{createStartTime}</if>
+            <if test="createEndTime != null">AND Upload_time &lt;= #{createEndTime}</if>
+        </where>
+        order by Id desc
+    </select>
+
+</mapper>

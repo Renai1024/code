@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesZhongCeLaoHuaRecordReportMapper">
+
+    <resultMap type="com.miracle.extra.domain.MesZhongCeLaoHuaRecordReport" id="MesZhongCeLaoHuaRecordReportResult">
+        <id property="id" column="Id" />
+        <result property="createTime" column="CreateTime" />
+        <result property="stationId" column="station_id" />
+        <result property="machineId" column="machine_id" />
+        <result property="sn" column="sn" />
+        <result property="sn2" column="sn2" />
+        <result property="pn" column="pn" />
+        <result property="orderId" column="order_id" />
+        <result property="batchId" column="batch_id" />
+        <result property="user" column="user" />
+        <result property="result" column="result" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="data" column="data" />
+    </resultMap>
+
+    <sql id="selectMesZhongCeLaoHuaRecordReportVo">
+        select Id, CreateTime, station_id, machine_id, sn, sn2, pn, order_id, batch_id, "user", result, start_time, end_time, "data"
+        from ZhongCeLaoHuaRecord
+    </sql>
+
+    <select id="selectMesZhongCeLaoHuaRecordReportList" parameterType="com.miracle.extra.domain.MesZhongCeLaoHuaRecordReport" resultMap="MesZhongCeLaoHuaRecordReportResult">
+        <include refid="selectMesZhongCeLaoHuaRecordReportVo" />
+        <where>
+            <if test="stationId != null and stationId != ''">AND station_id LIKE CONCAT('%', #{stationId}, '%')</if>
+            <if test="machineId != null and machineId != ''">AND machine_id LIKE CONCAT('%', #{machineId}, '%')</if>
+            <if test="sn != null and sn != ''">AND sn LIKE CONCAT('%', #{sn}, '%')</if>
+            <if test="sn2 != null and sn2 != ''">AND sn2 LIKE CONCAT('%', #{sn2}, '%')</if>
+            <if test="pn != null and pn != ''">AND pn LIKE CONCAT('%', #{pn}, '%')</if>
+            <if test="orderId != null and orderId != ''">AND order_id LIKE CONCAT('%', #{orderId}, '%')</if>
+            <if test="batchId != null and batchId != ''">AND batch_id LIKE CONCAT('%', #{batchId}, '%')</if>
+            <if test="user != null and user != ''">AND "user" LIKE CONCAT('%', #{user}, '%')</if>
+            <if test="result != null and result != ''">AND result = #{result}</if>
+            <if test="createStartTime != null">AND CreateTime &gt;= #{createStartTime}</if>
+            <if test="createEndTime != null">AND CreateTime &lt;= #{createEndTime}</if>
+            <if test="startStartTime != null">AND start_time &gt;= #{startStartTime}</if>
+            <if test="startEndTime != null">AND start_time &lt;= #{startEndTime}</if>
+        </where>
+        order by CreateTime desc
+    </select>
+
+</mapper>

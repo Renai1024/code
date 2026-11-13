@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.DeliveryLabelWithoutSNMapper">
+
+    <resultMap type="com.miracle.extra.domain.DeliveryLabelWithoutSN" id="DeliveryLabelWithoutSNResult">
+        <result property="fid" column="FID"/>
+        <result property="customerFlag" column="CustomerFlag"/>
+        <result property="materialOldCode" column="MaterialOldCode"/>
+        <result property="customerCode" column="CustomerCode"/>
+        <result property="lotNumber" column="LotNumber"/>
+        <result property="manufactureDate" column="ManufactureDate"/>
+        <result property="barCodeStr" column="BarCodeStr"/>
+        <result property="labelNumber" column="LabelNumber"/>
+        <result property="customField1" column="CustomField1"/>
+        <result property="customField2" column="CustomField2"/>
+        <result property="labelPrintDateTime" column="LabelPrintDateTime"/>
+    </resultMap>
+
+    <sql id="selectDeliveryLabelWithoutSNVo">
+        SELECT
+            FID,
+            CustomerFlag,
+            MaterialOldCode,
+            CustomerCode,
+            LotNumber,
+            ManufactureDate,
+            BarCodeStr,
+            LabelNumber,
+            CustomField1,
+            CustomField2,
+            LabelPrintDateTime
+        FROM dbo.vwOutBoxLabelRecord
+    </sql>
+
+    <select id="selectByBarCodeStr" parameterType="string" resultMap="DeliveryLabelWithoutSNResult">
+        <include refid="selectDeliveryLabelWithoutSNVo"/>
+        WHERE BarCodeStr = #{barCodeStr}
+    </select>
+
+    <select id="selectListByCustomerFlag" parameterType="string" resultMap="DeliveryLabelWithoutSNResult">
+        <include refid="selectDeliveryLabelWithoutSNVo"/>
+        WHERE CustomerFlag = #{customerFlag}
+        ORDER BY LabelPrintDateTime, LabelNumber
+    </select>
+
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesHengHeHongKaoXiangReportMapper">
+
+    <resultMap type="com.miracle.extra.domain.MesHengHeHongKaoXiangReport$HengHeHongKaoXiangItem" id="HengHeHongKaoXiangItemResult">
+        <result property="sampleCode" column="sampleCode" />
+        <result property="addedAt" column="addedAt" />
+    </resultMap>
+
+    <resultMap type="com.miracle.extra.domain.MesHengHeHongKaoXiangReport" id="MesHengHeHongKaoXiangReportResult">
+        <id property="runId" column="runId" />
+        <result property="id" column="Id" />
+        <result property="createTime" column="CreateTime" />
+        <result property="eventType" column="eventType" />
+        <result property="eventTime" column="eventTime" />
+        <result property="userName" column="userName" />
+        <result property="unlockTemperature" column="unlockTemperature" />
+        <result property="startTime" column="startTime" />
+        <result property="stopTime" column="stopTime" />
+        <result property="latestSnapshot" column="latestSnapshot" />
+        <result property="samplesJson" column="samplesJson" />
+        <collection property="items" ofType="com.miracle.extra.domain.MesHengHeHongKaoXiangReport$HengHeHongKaoXiangItem" resultMap="HengHeHongKaoXiangItemResult" />
+    </resultMap>
+
+    <sql id="selectMesHengHeHongKaoXiangReportVo">
+        select 
+            s.Id, 
+            s.CreateTime, 
+            s.eventType, 
+            s.eventTime, 
+            s.runId, 
+            s.userName, 
+            s.unlockTemperature, 
+            s.startTime, 
+            t.stopTime, 
+            t.latestSnapshot,
+            s.samplesJson, 
+            i.sampleCode, 
+            i.addedAt
+        from HengHeHongKaoXiang s
+        left join HengHeHongKaoXiang t on s.runId = t.runId and t.eventType = 'stop'
+        left join HengHeHongKaoXiang_Item i on s.runId = i.runId
+        where s.eventType = 'start'
+    </sql>
+
+    <select id="selectMesHengHeHongKaoXiangReportList" parameterType="com.miracle.extra.domain.MesHengHeHongKaoXiangReport" resultMap="MesHengHeHongKaoXiangReportResult">
+        <include refid="selectMesHengHeHongKaoXiangReportVo" />
+            <if test="runId != null and runId != ''">AND s.runId = #{runId}</if>
+            <if test="userName != null and userName != ''">AND s.userName LIKE CONCAT('%', #{userName}, '%')</if>
+            <if test="sampleCode != null and sampleCode != ''">AND s.runId IN (SELECT runId FROM HengHeHongKaoXiang_Item WHERE sampleCode LIKE CONCAT('%', #{sampleCode}, '%'))</if>
+            <if test="createStartTime != null">AND s.CreateTime &gt;= #{createStartTime}</if>
+            <if test="createEndTime != null">AND s.CreateTime &lt;= #{createEndTime}</if>
+            <if test="startStartTime != null">AND s.startTime &gt;= #{startStartTime}</if>
+            <if test="startEndTime != null">AND s.startTime &lt;= #{startEndTime}</if>
+        order by s.CreateTime desc
+    </select>
+
+</mapper>

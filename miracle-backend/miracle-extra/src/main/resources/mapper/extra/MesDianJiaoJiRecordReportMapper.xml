@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesDianJiaoJiRecordReportMapper">
+
+    <resultMap type="MesDianJiaoJiRecordReport" id="MesDianJiaoJiRecordReportResult">
+        <result property="id" column="id"/>
+        <result property="createAt" column="createat"/>
+        <result property="tiaoma" column="tiaoma"/>
+        <result property="guanjiaoshijian" column="guanjiaoshijian"/>
+        <result property="dianjiaosudu" column="dianjiaosudu"/>
+        <result property="deviceId" column="deviceid"/>
+        <result property="workDate" column="workdate"/>
+        <result property="workResults" column="workresults"/>
+    </resultMap>
+
+    <sql id="selectMesDianJiaoJiRecordReportVo">
+        SELECT
+            Id AS id,
+            CreateAt AS createat,
+            tiaoma AS tiaoma,
+            guanjiaoshijian AS guanjiaoshijian,
+            dianjiaosudu AS dianjiaosudu,
+            DeviceId AS deviceid,
+            WorkDate AS workdate,
+            WorkResults AS workresults
+        FROM dbo.DianJiaoJiRecord
+    </sql>
+
+    <select id="selectMesDianJiaoJiRecordReportList" parameterType="MesDianJiaoJiRecordReport" resultMap="MesDianJiaoJiRecordReportResult">
+        <include refid="selectMesDianJiaoJiRecordReportVo"/>
+        <where>
+            <if test="tiaoma != null and tiaoma != ''">
+                AND tiaoma LIKE CONCAT('%', #{tiaoma}, '%')
+            </if>
+            <if test="deviceId != null and deviceId != ''">
+                AND DeviceId LIKE CONCAT('%', #{deviceId}, '%')
+            </if>
+            <if test="workResults != null and workResults != ''">
+                AND WorkResults = #{workResults}
+            </if>
+            <if test="testStartTime != null">
+                AND TRY_CONVERT(DATE, WorkDate) &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                AND TRY_CONVERT(DATE, WorkDate) &lt;= #{testEndTime}
+            </if>
+        </where>
+        order by CreateAt desc
+    </select>
+
+</mapper>

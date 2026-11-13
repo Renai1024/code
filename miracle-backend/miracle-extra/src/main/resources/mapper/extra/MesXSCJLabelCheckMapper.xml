@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesXSCJLabelCheckMapper">
+
+    <resultMap type="MesXSCJLabelCheck" id="MesXSCJLabelCheckResult">
+        <result property="fid" column="FID"/>
+        <result property="barCodeStr" column="BarCodeStr"/>
+        <result property="scanDate" column="ScanDate"/>
+        <result property="scanMachine" column="ScanMachine"/>
+        <result property="scanIPAddress" column="ScanIPAddress"/>
+        <result property="customerFlag" column="CustomerFlag"/>
+        <result property="operator" column="Operator"/>
+        <result property="materialCode" column="MaterialCode"/>
+        <result property="duplicateFlag" column="DuplicateFlag"/>
+    </resultMap>
+
+    <sql id="selectMesXSCJLabelCheckVo">
+        SELECT
+            FID
+            ,BarCodeStr
+            ,ScanDate
+            ,ScanMachine
+            ,ScanIPAddress
+            ,DuplicateFlag
+            ,CASE CustomerFlag
+                WHEN 'XSCDZ' THEN '线束充电座'
+                WHEN 'XSCDQ' THEN '线束充电枪'
+                ELSE ''
+                END
+            AS CustomerFlag
+            ,Operator
+            ,MaterialCode
+        FROM dbo.LabelCheckXSCJ
+    </sql>
+
+    <select id="selectMesXSCJLabelCheckList" parameterType="MesXSCJLabelCheck" resultMap="MesXSCJLabelCheckResult">
+        <include refid="selectMesXSCJLabelCheckVo"/>
+        <where>
+            <if test="barCodeStr != null and barCodeStr != ''">
+                AND BarCodeStr LIKE CONCAT('%', #{barCodeStr}, '%')
+            </if>
+            <if test="duplicateFlag != null">
+                AND DuplicateFlag  = #{duplicateFlag}
+            </if>
+            <if test="customerFlag != null and customerFlag != ''">
+                AND CustomerFlag = #{customerFlag}
+            </if>
+            <if test="operator != null and operator != ''">
+                AND operator = #{operator}
+            </if>
+            <if test="testStartTime != null">
+                AND ScanDate &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                AND ScanDate &lt;= #{testEndTime}
+            </if>
+        </where>
+        order by ScanDate desc
+    </select>
+
+</mapper>

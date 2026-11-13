@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesTSDZhiNengDianPiReportMapper">
+
+    <resultMap type="MesTSDZhiNengDianPiReport" id="MesTSDZhiNengDianPiReportResult">
+        <result property="id" column="id"/>
+        <result property="createTime" column="createtime"/>
+        <result property="sn" column="sn"/>
+        <result property="finishTime" column="finishtime"/>
+        <result property="result" column="result"/>
+        <result property="mesId" column="mes_id"/>
+        <result property="demoData1" column="demo_data1"/>
+        <result property="demoData2" column="demo_data2"/>
+        <result property="demoData3" column="demo_data3"/>
+        <result property="demoData4" column="demo_data4"/>
+    </resultMap>
+
+    <sql id="selectMesTSDZhiNengDianPiReportVo">
+        SELECT
+        Id AS id,
+        CreateTime AS createtime,
+        sn AS sn,
+        finishTime AS finishtime,
+        result AS result,
+        mes_id AS mes_id,
+        demo_data1 AS demo_data1,
+        demo_data2 AS demo_data2,
+        demo_data3 AS demo_data3,
+        demo_data4 AS demo_data4
+        FROM dbo.TSDZhiNengDianPi
+    </sql>
+
+    <select id="selectMesTSDZhiNengDianPiReportList" parameterType="MesTSDZhiNengDianPiReport" resultMap="MesTSDZhiNengDianPiReportResult">
+        <include refid="selectMesTSDZhiNengDianPiReportVo"/>
+        <where>
+            <if test="sn != null and sn != ''">
+                AND sn LIKE CONCAT('%', #{sn}, '%')
+            </if>
+            <if test="result != null and result != ''">
+                AND result = #{result}
+            </if>
+            <if test="mesId != null and mesId != ''">
+                AND mes_id LIKE CONCAT('%', #{mesId}, '%')
+            </if>
+            <if test="demoData1 != null and demoData1 != ''">
+                AND demo_data1 LIKE CONCAT('%', #{demoData1}, '%')
+            </if>
+            <if test="finishStartTime != null">
+                AND TRY_CONVERT(DATETIME, finishTime) &gt;= #{finishStartTime}
+            </if>
+            <if test="finishEndTime != null">
+                AND TRY_CONVERT(DATETIME, finishTime) &lt;= #{finishEndTime}
+            </if>
+        </where>
+        order by createtime desc
+    </select>
+
+</mapper>

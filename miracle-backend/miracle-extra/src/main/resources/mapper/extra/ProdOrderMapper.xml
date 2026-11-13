@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.miracle.extra.mapper.ProdOrderMapper">
+
+    <!-- 定义查询结果映射（排除创建时间和图片） -->
+    <resultMap id="ProdOrderResultMap" type="com.miracle.extra.domain.ProdOrder">
+        <result column="生产工单号" property="productionOrderNo" jdbcType="VARCHAR"/>
+        <result column="车间" property="workshop" jdbcType="VARCHAR"/>
+        <result column="物料编号" property="materialCode" jdbcType="VARCHAR"/>
+        <result column="物料名称" property="materialName" jdbcType="VARCHAR"/>
+        <result column="计划数量" property="plannedQuantity" jdbcType="DECIMAL"/>
+        <!-- 注意：不映射 创建时间 和 图片 -->
+    </resultMap>
+
+    <!-- 定义公共查询列（排除创建时间和图片） -->
+    <sql id="Base_Column_List">
+        `生产工单号`,
+        `车间`,
+        `物料编号`,
+        `物料名称`,
+        `计划数量`
+    </sql>
+
+    <!-- 根据工单号查询 -->
+    <select id="selectByOrderNo" resultMap="ProdOrderResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ods_v_mes_prododertobbpt
+        WHERE `生产工单号` = #{productionOrderNo}
+        LIMIT 1
+    </select>
+
+    <!-- 根据工单号列表批量查询 -->
+    <select id="selectByOrderNoList" resultMap="ProdOrderResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ods_v_mes_prododertobbpt
+        WHERE `生产工单号` IN
+        <foreach collection="orderNoList" item="orderNo" open="(" separator="," close=")">
+            #{orderNo}
+        </foreach>
+    </select>
+
+</mapper>

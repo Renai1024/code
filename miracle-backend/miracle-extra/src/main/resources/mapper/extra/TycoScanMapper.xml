@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 新增：按现有项目习惯集中管理SQL；原注解实现保存在implementation-history/20261026-tyco-global-delete。 -->
+<mapper namespace="com.miracle.extra.mapper.TycoScanMapper">
+    <resultMap id="TycoScanBatchResult" type="com.miracle.extra.domain.TycoScan$Batch">
+        <id property="requestId" column="request_id" />
+        <result property="boxCode" column="box_code" />
+        <result property="quantity" column="quantity" />
+        <result property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="payloadHash" column="payload_hash" />
+        <result property="createdAt" column="created_at" />
+        <result property="delFlag" column="del_flag" />
+    </resultMap>
+    <sql id="batchColumns">request_id,box_code,quantity,user_id,user_name,payload_hash,created_at,del_flag</sql>
+    <!-- 新增：JDBC连接的ARITHABORT等默认值可能不同，写入前在同一事务连接明确设置。 -->
+    <update id="prepareWriteSession">
+        SET ANSI_NULLS ON;
+        SET QUOTED_IDENTIFIER ON;
+        SET ANSI_PADDING ON;
+        SET ANSI_WARNINGS ON;
+        SET CONCAT_NULL_YIELDS_NULL ON;
+        SET ARITHABORT ON;
+        SET NUMERIC_ROUNDABORT OFF;
+    </update>
+    <!-- 新增：幂等查询包含已删除记录，旧请求不能因列表隐藏而复活。 -->
+    <select id="find" resultMap="TycoScanBatchResult">
+        SELECT <include refid="batchColumns" /> FROM dbo.tyco_scan_batch WHERE request_id=#{id}
+    </select>
+    <select id="findForUpdate" resultMap="TycoScanBatchResult">
+        SELECT <include refid="batchColumns" /> FROM dbo.tyco_scan_batch WITH(UPDLOCK,HOLDLOCK) WHERE request_id=#{id}
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(1) FROM dbo.tyco_scan_item WHERE product_code=#{code} AND del_flag='0'
+    </select>
+    <select id="countBox" resultType="int">
+        SELECT COUNT(1) FROM dbo.tyco_scan_batch
+        WHERE box_key=HASHBYTES('SHA2_256',CAST(#{boxCode,jdbcType=NVARCHAR} AS NVARCHAR(2048))) AND del_flag='0'
+    </select>
+    <insert id="insert">
+        INSERT INTO dbo.tyco_scan_batch(request_id,box_code,quantity,user_id,user_name,payload_hash)
+        VALUES(#{requestId},#{boxCode},#{quantity},#{userId},#{userName},#{payloadHash})
+    </insert>
+    <!-- 新增：保留旧版box_key列，范围从箱头计算；最终唯一约束改为产品码全局唯一。 -->
+    <insert id="insertProduct">
+        INSERT INTO dbo.tyco_scan_item(request_id,product_code,box_key)
+        SELECT request_id,#{code},box_key FROM dbo.tyco_scan_batch WHERE request_id=#{id} AND del_flag='0'
+    </insert>
+    <select id="list" resultMap="TycoScanBatchResult">
+        SELECT <include refid="batchColumns" /> FROM dbo.tyco_scan_batch WHERE del_flag='0'
+        ORDER BY created_at DESC,request_id
+    </select>
+    <select id="details" resultType="string">
+        SELECT i.product_code FROM dbo.tyco_scan_item i JOIN dbo.tyco_scan_batch b ON b.request_id=i.request_id
+        WHERE i.request_id=#{id} AND i.del_flag='0' AND b.del_flag='0' ORDER BY i.item_id
+    </select>
+    <update id="deleteProducts">
+        UPDATE dbo.tyco_scan_item SET del_flag='2' WHERE request_id=#{id} AND del_flag='0'
+    </update>
+    <update id="deleteBatch">
+        UPDATE dbo.tyco_scan_batch SET del_flag='2' WHERE request_id=#{id} AND del_flag='0'
+    </update>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.WKACCheckHMapper">
+
+    <resultMap type="WKACCheckH" id="WKACCheckHResult">
+        <result property="id" column="Id"/>
+        <result property="ResultStr" column="ResultStr"/>
+        <result property="CheckStartTime" column="CheckStartTime"/>
+        <result property="CheckEndTime" column="CheckEndTime"/>
+        <result property="StockInBarCode" column="StockInBarCode"/>
+        <result property="CustomerFlag" column="CustomerFlag"/>
+        <result property="MyField1" column="MyField1"/>
+        <result property="MyField2" column="MyField2"/>
+        <result property="MyField3" column="MyField3"/>
+        <result property="MyField4" column="MyField4"/>
+        <result property="MyField5" column="MyField5"/>
+        <result property="MyField6" column="MyField6"/>
+    </resultMap>
+
+    <sql id="selectWKACCheckHVo">
+        SELECT Id
+        ,ResultStr
+        ,CheckStartTime
+        ,CheckEndTime
+        ,StockInBarCode
+        ,CustomerFlag
+        ,MyField1
+        ,MyField2
+        ,MyField3
+        ,MyField4
+        ,MyField5
+        ,MyField6
+        FROM dbo.WKACCheckH
+    </sql>
+
+    <select id="selectWKACCheckHList" parameterType="WKACCheckH" resultMap="WKACCheckHResult">
+        <include refid="selectWKACCheckHVo"/>
+        <where>
+            <if test="CustomerFlag != null and CustomerFlag != ''">
+                AND CustomerFlag = #{CustomerFlag}
+            </if>
+            <if test="ResultStr != null and ResultStr != ''">
+                AND ResultStr LIKE CONCAT('%', #{ResultStr}, '%')
+            </if>
+            <if test="MyField1 != null and MyField1 != ''">
+                AND MyField1 LIKE CONCAT('%', #{MyField1}, '%')
+            </if>
+            <if test="StockInBarCode != null and StockInBarCode != ''">
+                AND StockInBarCode LIKE CONCAT('%', #{StockInBarCode}, '%')
+            </if>
+            <if test="MyField2 != null and MyField2 != ''">
+                AND MyField2 LIKE CONCAT('%', #{MyField2}, '%')
+            </if>
+            <if test="MyField3 != null and MyField3 != ''">
+                AND MyField3 LIKE CONCAT('%', #{MyField3}, '%')
+            </if>
+            <if test="MyField4 != null and MyField4 != ''">
+                AND MyField4 LIKE CONCAT('%', #{MyField4}, '%')
+            </if>
+            <if test="MyField5 != null and MyField5 != ''">
+                AND MyField5 LIKE CONCAT('%', #{MyField5}, '%')
+            </if>
+            <if test="MyField6 != null and MyField6 != ''">
+                AND MyField6 LIKE CONCAT('%', #{MyField6}, '%')
+            </if>
+            <if test="testStartTime != null">
+                AND CheckStartTime &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                AND CheckStartTime &lt;= #{testEndTime}
+            </if>
+        </where>
+        order by CheckStartTime desc
+    </select>
+
+</mapper>

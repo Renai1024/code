@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesDuanziyajieReportMapper">
+
+    <resultMap type="MesDuanziyajieReport" id="MesDuanZiYaJieReportResult">
+        <result property="id" column="id"/>
+        <result property="no" column="no"/>
+        <result property="serialNumber" column="serialnumber"/>
+        <result property="dateTime" column="datetime"/>
+        <result property="proUniqueCode" column="prouniquecode"/>
+        <result property="wireType" column="wiretype"/>
+        <result property="pressureWeldingMode" column="pressureweldingmode"/>
+        <result property="rivetingHeight" column="rivetingheight"/>
+        <result property="rivetingCorrection" column="rivetingcorrection"/>
+        <result property="preloadingTrip" column="preloadingtrip"/>
+        <result property="locationLocation" column="locationlocation"/>
+        <result property="holdingTime" column="holdingtime"/>
+        <result property="startWay" column="startway"/>
+        <result property="peakLoad" column="peakload"/>
+        <result property="peakDeviation" column="peakdeviation"/>
+        <result property="peakCrimpingLoad" column="peakcrimpingload"/>
+        <result property="pressureMonitoringPeak" column="pressuremonitoringpeak"/>
+        <result property="detectPatterns" column="detectpatterns"/>
+        <result property="rivetingPressureSpeed" column="rivetingpressurespeed"/>
+        <result property="toleranceNumber" column="tolerancenumber"/>
+        <result property="cpk" column="cpk"/>
+        <result property="security" column="security"/>
+        <result property="peakRange" column="peakrange"/>
+        <result property="peakJudgement" column="peakjudgement"/>
+        <result property="areaRange" column="arearange"/>
+        <result property="areaJudgement" column="areajudgement"/>
+        <result property="offsetRange" column="offsetrange"/>
+        <result property="offsetJudgement" column="offsetjudgement"/>
+        <result property="lessCoreWireRange" column="lesscorewirerange"/>
+        <result property="lessCoreWireJudgement" column="lesscorewirejudgement"/>
+        <result property="samplingWindowWidth" column="samplingwindowwidth"/>
+        <result property="result" column="result"/>
+        <result property="operators" column="operators"/>
+        <result property="administrator" column="administrator"/>
+        <result property="applicationNo" column="applicationno"/>
+        <result property="equipmentNo" column="equipmentno"/>
+        <result property="createdAt" column="createdat"/>
+    </resultMap>
+
+    <sql id="selectMesReportDuanZiYaJieVo">
+        SELECT
+        Id AS id,
+        "No" AS no,
+        SerialNumber AS serialnumber,
+        "DateTime" AS datetime,
+        ProUniqueCode AS prouniquecode,
+        WireType AS wiretype,
+        PressureWeldingMode AS pressureweldingmode,
+        RivetingHeight AS rivetingheight,
+        RivetingCorrection AS rivetingcorrection,
+        PreloadingTrip AS preloadingtrip,
+        LocationLocation AS locationlocation,
+        HoldingTime AS holdingtime,
+        StartWay AS startway,
+        PeakLoad AS peakload,
+        PeakDeviation AS peakdeviation,
+        PeakCrimpingLoad AS peakcrimpingload,
+        PressureMonitoringPeak AS pressuremonitoringpeak,
+        DetectPatterns AS detectpatterns,
+        RivetingPressureSpeed AS rivetingpressurespeed,
+        ToleranceNumber AS tolerancenumber,
+        Cpk AS cpk,
+        Security AS security,
+        PeakRange AS peakrange,
+        PeakJudgement AS peakjudgement,
+        AreaRange AS arearange,
+        AreaJudgement AS areajudgement,
+        OffsetRange AS offsetrange,
+        OffsetJudgement AS offsetjudgement,
+        LessCoreWireRange AS lesscorewirerange,
+        LessCoreWireJudgement AS lesscorewirejudgement,
+        SamplingWindowWidth AS samplingwindowwidth,
+        Result AS result,
+        Operators AS operators,
+        Administrator AS administrator,
+        ApplicationNo AS applicationno,
+        EquipmentNo AS equipmentno,
+        CreatedAt AS createdat
+        FROM dbo.DuanZiYaJieRecord
+    </sql>
+
+    <select id="selectMesDuanziyajieReportList" parameterType="MesDuanziyajieReport" resultMap="MesDuanZiYaJieReportResult">
+        <include refid="selectMesReportDuanZiYaJieVo"/>
+        <where>
+            <if test="proUniqueCode != null and proUniqueCode != ''">
+                AND ProUniqueCode LIKE CONCAT('%', #{proUniqueCode}, '%')
+            </if>
+            <if test="wireType != null and wireType != ''">
+                AND WireType LIKE CONCAT('%', #{wireType}, '%')
+            </if>
+            <if test="equipmentNo != null and equipmentNo != ''">
+                AND EquipmentNo LIKE CONCAT('%', #{equipmentNo}, '%')
+            </if>
+            <if test="result != null and result != ''">
+                AND Result = #{result}
+            </if>
+            <if test="testStartTime != null">
+                AND "DateTime" &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                AND "DateTime" &lt;= #{testEndTime}
+            </if>
+        </where>
+        order by "DateTime" desc
+    </select>
+
+</mapper>

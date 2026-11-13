@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.miracle.extra.mapper.ProdOrderlistMapper">
+
+    <!-- 基础字段（不含创建时间和图片） -->
+    <sql id="Base_Column_List">
+        `生产工单号`,
+        `车间`,
+        `物料编号`,
+        `物料名称`,
+        `计划数量`
+    </sql>
+
+    <!-- 全部字段（含创建时间和图片） -->
+    <sql id="All_Column_List">
+        `生产工单号`,
+        `车间`,
+        `物料编号`,
+        `物料名称`,
+        `计划数量`,
+        `创建时间`,
+        `创建人`,
+        `修改时间`,
+        `修改人`,
+        `图片`
+    </sql>
+
+    <!-- 结果映射（不含创建时间和图片） -->
+    <resultMap id="ProdOrderResultMap" type="com.miracle.extra.domain.ProdOrderlist">
+        <id column="生产工单号" property="productionOrderNo"/>
+        <result column="车间" property="workshop"/>
+        <result column="物料编号" property="materialCode"/>
+        <result column="物料名称" property="materialName"/>
+        <result column="计划数量" property="plannedQuantity"/>
+    </resultMap>
+
+    <!-- 完整结果映射 -->
+    <resultMap id="ProdOrderFullResultMap" type="com.miracle.extra.domain.ProdOrderlist">
+        <id column="生产工单号" property="productionOrderNo"/>
+        <result column="车间" property="workshop"/>
+        <result column="物料编号" property="materialCode"/>
+        <result column="物料名称" property="materialName"/>
+        <result column="计划数量" property="plannedQuantity"/>
+        <result column="创建人" property="createBy"/>
+        <result column="创建时间" property="createTime"/>
+        <result column="修改人" property="modifyBy"/>
+        <result column="修改时间" property="modifyTime"/>
+        <result column="图片" property="image"/>
+    </resultMap>
+
+    <!-- ==================== 查询 ==================== -->
+
+    <!-- 根据工单号查询（返回完整信息，含图片） -->
+    <select id="selectByOrderNo" resultMap="ProdOrderFullResultMap">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM ods_v_mes_prododertobbpt_list
+        WHERE `生产工单号` = #{productionOrderNo}
+        LIMIT 1
+    </select>
+
+    <!-- 分页列表查询（返回完整信息，含图片） -->
+    <select id="selectList" resultMap="ProdOrderFullResultMap">
+        SELECT
+        <include refid="All_Column_List"/>
+        FROM ods_v_mes_prododertobbpt_list
+        <where>
+            <if test="productionOrderNo != null and productionOrderNo != ''">
+                AND `生产工单号` LIKE CONCAT('%', #{productionOrderNo}, '%')
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND `物料编号` LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="materialName != null and materialName != ''">
+                AND `物料名称` LIKE CONCAT('%', #{materialName}, '%')
+            </if>
+        </where>
+        ORDER BY `创建时间` DESC
+    </select>
+
+    <!-- 统计总数 -->
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM ods_v_mes_prododertobbpt_list
+        <where>
+            <if test="productionOrderNo != null and productionOrderNo != ''">
+                AND `生产工单号` LIKE CONCAT('%', #{productionOrderNo}, '%')
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                AND `物料编号` LIKE CONCAT('%', #{materialCode}, '%')
+            </if>
+            <if test="materialName != null and materialName != ''">
+                AND `物料名称` LIKE CONCAT('%', #{materialName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- ==================== 新增（创建时间由前端传入，图片为URL字符串） ==================== -->
+
+    <insert id="insert">
+        INSERT INTO ods_v_mes_prododertobbpt_list (
+            `生产工单号`,
+            `车间`,
+            `物料编号`,
+            `物料名称`,
+            `计划数量`,
+            `创建人`,
+            `创建时间`,
+            `修改人`,
+            `修改时间`,
+            `图片`
+        ) VALUES (
+                     #{productionOrderNo},
+                     #{workshop},
+                     #{materialCode},
+                     #{materialName},
+                     #{plannedQuantity},
+                     #{createBy},
+                     #{createTime},
+                     #{modifyBy},
+                     #{modifyTime},
+                     #{image}
+                 )
+    </insert>
+
+    <!-- ==================== 批量新增 ==================== -->
+
+    <insert id="insertBatch">
+        INSERT INTO ods_v_mes_prododertobbpt_list (
+        `生产工单号`,
+        `车间`,
+        `物料编号`,
+        `物料名称`,
+        `计划数量`,
+        `创建人`,
+        `创建时间`,
+        `修改人`,
+        `修改时间`,
+        `图片`
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.productionOrderNo},
+            #{item.workshop},
+            #{item.materialCode},
+            #{item.materialName},
+            #{item.plannedQuantity},
+            #{item.createBy},
+            #{item.createTime},
+            #{modifyBy},
+            #{modifyTime},
+            #{item.image}
+            )
+        </foreach>
+    </insert>
+
+    <!-- ==================== 修改（含图片） ==================== -->
+
+    <update id="update">
+        UPDATE ods_v_mes_prododertobbpt_list
+        <set>
+            <if test="workshop != null and workshop != ''">
+                `车间` = #{workshop},
+            </if>
+            <if test="materialCode != null and materialCode != ''">
+                `物料编号` = #{materialCode},
+            </if>
+            <if test="materialName != null and materialName != ''">
+                `物料名称` = #{materialName},
+            </if>
+            <if test="plannedQuantity != null">
+                `计划数量` = #{plannedQuantity},
+            </if>
+            <if test="image != null">
+                `图片` = #{image},
+            </if>
+            <if test="modifyBy != null and modifyBy != ''">
+                `修改人` = #{modifyBy},
+            </if>
+            <if test="modifyTime != null">
+                `修改时间` = #{modifyTime},
+            </if>
+        </set>
+        WHERE `生产工单号` = #{productionOrderNo}
+    </update>
+
+    <!-- ==================== 删除 ==================== -->
+
+    <delete id="delete">
+        DELETE FROM ods_v_mes_prododertobbpt_list
+        WHERE `生产工单号` = #{productionOrderNo}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteBatch">
+        DELETE FROM ods_v_mes_prododertobbpt_list
+        WHERE `生产工单号` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

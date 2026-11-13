@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesDZDuanziyajiejiMapper">
+
+    <resultMap type="MesDZDuanziyajieji" id="MesDZDuanZiYaJieJiResult">
+        <result property="id" column="Id"/>
+        <result property="dateTime" column="DateTime"/>
+        <result property="maxKg" column="MaxKg"/>
+        <result property="maxKgDif" column="MaxKgDif"/>
+        <result property="maxKgMaxDif" column="MaxKgMaxDif"/>
+        <result property="maxKgMinDif" column="MaxKgMinDif"/>
+        <result property="maxKgPosDif" column="MaxKgPosDif"/>
+        <result property="maxKgPosMaxDif" column="MaxKgPosMaxDif"/>
+        <result property="maxKgPosMinDif" column="MaxKgPosMinDif"/>
+        <result property="totalAreaDif" column="TotalAreaDif"/>
+        <result property="totalAreaMaxDif" column="TotalAreaMaxDif"/>
+        <result property="totalAreaMinDif" column="TotalAreaMinDif"/>
+        <result property="area3Dif" column="Area3Dif"/>
+        <result property="area3MaxDif" column="Area3MaxDif"/>
+        <result property="area3MinDif" column="Area3MinDif"/>
+        <result property="cpk" column="Cpk"/>
+        <result property="stability" column="Stability"/>
+        <result property="pressHigh" column="PressHigh"/>
+        <result property="workStation" column="WorkStation"/>
+        <result property="deviceName" column="DeviceName"/>
+        <result property="productNo" column="ProductNo"/>
+        <result property="lineType" column="LineType"/>
+        <result property="termType" column="TermType"/>
+        <result property="modeType" column="ModeType"/>
+        <result property="result" column="Result"/>
+        <result property="createdAt" column="CreatedAt"/>
+    </resultMap>
+
+    <sql id="selectMesDZDuanZiYaJiejiVo">
+        select
+        Id,
+        "DateTime",
+        MaxKg,
+        MaxKgDif,
+        MaxKgMaxDif,
+        MaxKgMinDif,
+        MaxKgPosDif,
+        MaxKgPosMaxDif,
+        MaxKgPosMinDif,
+        TotalAreaDif,
+        TotalAreaMaxDif,
+        TotalAreaMinDif,
+        Area3Dif,
+        Area3MaxDif,
+        Area3MinDif,
+        Cpk,
+        Stability,
+        PressHigh,
+        WorkStation,
+        DeviceName,
+        ProductNo,
+        LineType,
+        TermType,
+        ModeType,
+        Result,
+        CreatedAt
+        from dbo.DuanZiYaJie
+    </sql>
+
+    <select id="selectMesDZDuanziyajiejiList" parameterType="MesDZDuanziyajieji" resultMap="MesDZDuanZiYaJieJiResult">
+        <include refid="selectMesDZDuanZiYaJiejiVo"/>
+        <where>
+            <if test="productNo != null and productNo != ''">
+                and ProductNo like concat('%', #{productNo}, '%')
+            </if>
+            <if test="workStation != null and workStation != ''">
+                and WorkStation like concat('%', #{workStation}, '%')
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                and DeviceName like concat('%', #{deviceName}, '%')
+            </if>
+            <if test="result != null and result != ''">
+                and Result like concat('%', #{result}, '%')
+            </if>
+            <if test="testStartTime != null">
+                and "DateTime" &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                and "DateTime" &lt; DATEADD(day, 1, #{testEndTime})
+            </if>
+        </where>
+        order by "DateTime" desc
+    </select>
+
+</mapper>

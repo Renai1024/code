@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.BarcodeBindMapper">
+
+    <resultMap type="com.miracle.extra.domain.BarcodeBindRecord" id="BarcodeBindRecordResult">
+        <id property="id" column="Id" />
+        <result property="bindUuid" column="BindUuid" />
+        <result property="productCode" column="ProductCode" />
+        <result property="barcodeType1" column="BarcodeType1" />
+        <result property="barcodeValue1" column="BarcodeValue1" />
+        <result property="barcodeType2" column="BarcodeType2" />
+        <result property="barcodeValue2" column="BarcodeValue2" />
+        <result property="deviceNo" column="DeviceNo" />
+        <result property="remark" column="Remark" />
+        <result property="createTime" column="CreateTime" />
+        <result property="createBy" column="CreateBy" />
+        <result property="modifyTime" column="ModifyTime" />
+        <result property="modifyBy" column="ModifyBy" />
+        <result property="deleted" column="Deleted" />
+    </resultMap>
+
+    <sql id="selectBarcodeBindRecordVo">
+        select Id, BindUuid, ProductCode, BarcodeType1, BarcodeValue1,
+               BarcodeType2, BarcodeValue2, DeviceNo, Remark,
+               CreateTime, CreateBy, ModifyTime, ModifyBy, Deleted
+        from BarcodeBindRecord
+    </sql>
+
+    <insert id="insertBarcodeBindRecord" parameterType="com.miracle.extra.domain.BarcodeBindRecord">
+        INSERT INTO BarcodeBindRecord (
+            BindUuid, ProductCode, BarcodeType1, BarcodeValue1,
+            BarcodeType2, BarcodeValue2, DeviceNo, Remark,
+            CreateTime, CreateBy, Deleted
+        ) VALUES (
+            #{bindUuid}, #{productCode}, #{barcodeType1}, #{barcodeValue1},
+            #{barcodeType2}, #{barcodeValue2}, #{deviceNo}, #{remark},
+            #{createTime}, #{createBy}, #{deleted}
+        )
+    </insert>
+
+    <select id="selectByBindUuid" parameterType="string" resultMap="BarcodeBindRecordResult">
+        <include refid="selectBarcodeBindRecordVo" />
+        where BindUuid = #{bindUuid} AND Deleted = 0
+    </select>
+
+    <select id="selectBarcodeBindRecordList" parameterType="com.miracle.extra.domain.BarcodeBindRecord" resultMap="BarcodeBindRecordResult">
+        <include refid="selectBarcodeBindRecordVo" />
+        <where>
+            <if test="productCode != null and productCode != ''">AND ProductCode LIKE '%' + #{productCode} + '%'</if>
+            <if test="barcodeType1 != null and barcodeType1 != ''">AND BarcodeType1 = #{barcodeType1}</if>
+            <if test="barcodeValue1 != null and barcodeValue1 != ''">AND BarcodeValue1 LIKE '%' + #{barcodeValue1} + '%'</if>
+            <if test="barcodeType2 != null and barcodeType2 != ''">AND BarcodeType2 = #{barcodeType2}</if>
+            <if test="barcodeValue2 != null and barcodeValue2 != ''">AND BarcodeValue2 LIKE '%' + #{barcodeValue2} + '%'</if>
+            <if test="deviceNo != null and deviceNo != ''">AND DeviceNo LIKE '%' + #{deviceNo} + '%'</if>
+            <if test="createBy != null and createBy != ''">AND CreateBy LIKE '%' + #{createBy} + '%'</if>
+            AND Deleted = 0
+        </where>
+        order by CreateTime desc
+    </select>
+
+    <select id="selectByBarcode" parameterType="map" resultMap="BarcodeBindRecordResult">
+        <include refid="selectBarcodeBindRecordVo" />
+        where (BarcodeType1 = #{barcodeType} AND BarcodeValue1 = #{barcode})
+           OR (BarcodeType2 = #{barcodeType} AND BarcodeValue2 = #{barcode})
+          AND Deleted = 0
+    </select>
+
+    <delete id="deleteBarcodeBindRecordById" parameterType="long">
+        UPDATE BarcodeBindRecord SET Deleted = 1 WHERE Id = #{id}
+    </delete>
+
+    <update id="updateBarcodeBindRecord" parameterType="com.miracle.extra.domain.BarcodeBindRecord">
+        UPDATE BarcodeBindRecord
+        <set>
+            <if test="productCode != null">ProductCode = #{productCode},</if>
+            <if test="barcodeType1 != null">BarcodeType1 = #{barcodeType1},</if>
+            <if test="barcodeValue1 != null">BarcodeValue1 = #{barcodeValue1},</if>
+            <if test="barcodeType2 != null">BarcodeType2 = #{barcodeType2},</if>
+            <if test="barcodeValue2 != null">BarcodeValue2 = #{barcodeValue2},</if>
+            <if test="deviceNo != null">DeviceNo = #{deviceNo},</if>
+            <if test="remark != null">Remark = #{remark},</if>
+            <if test="modifyTime != null">ModifyTime = #{modifyTime},</if>
+            <if test="modifyBy != null">ModifyBy = #{modifyBy},</if>
+        </set>
+        where Id = #{id}
+    </update>
+
+</mapper>

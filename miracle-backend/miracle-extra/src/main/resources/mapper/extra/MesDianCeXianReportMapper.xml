@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miracle.extra.mapper.MesDianCeXianReportMapper">
+
+    <resultMap type="MesDianCeXianReport" id="MesReportDianCeXianResult">
+        <result property="id" column="ID"/>
+        <result property="mcgsDate" column="MCGS_Date"/>
+        <result property="mcgsTime" column="MCGS_Time"/>
+        <result property="barcode" column="Barcode"/>
+        <result property="equipmentNo" column="Equipment_NO"/>
+        <result property="batchNumber" column="batchNumber"/>
+        <result property="insulation1" column="Insulation_1"/>
+        <result property="insulation2" column="Insulation_2"/>
+        <result property="insulation3" column="Insulation_3"/>
+        <result property="insulation4" column="Insulation_4"/>
+        <result property="voltageResistance1" column="Voltage_resistance_1"/>
+        <result property="voltageResistance2" column="Voltage_resistance_2"/>
+        <result property="insulation1Qualified" column="Insulatio_1_qualified"/>
+        <result property="insulation2Qualified" column="Insulatio_2_qualified"/>
+        <result property="insulation3Qualified" column="Insulatio_3_qualified"/>
+        <result property="insulation4Qualified" column="Insulatio_4_qualified"/>
+        <result property="voltageResistance1Qualified" column="Voltage_resistance_1_qualified"/>
+        <result property="voltageResistance2Qualified" column="Voltage_resistance_2_qualified"/>
+        <result property="connect1Qualified" column="Connect1_qualified"/>
+        <result property="connect2Qualified" column="Connect2_qualified"/>
+        <result property="connect3Qualified" column="Connect3_qualified"/>
+        <result property="connect4Qualified" column="Connect4_qualified"/>
+        <result property="interpolarCapability" column="Interpolar_capability"/>
+        <result property="interpolarLoss" column="Interpolar_Loss"/>
+        <result property="polarRegionCapability" column="Polar_region_capability"/>
+        <result property="polarRegionLoss" column="Polar_region_Loss"/>
+        <result property="interpolarQualified" column="Interpolar_qualified"/>
+        <result property="polarRegionQualified" column="Polar_region_qualified"/>
+        <result property="testDateTime" column="testDateTime"/>
+        <result property="insulation5" column="Insulation_5"/>
+        <result property="insulation6" column="Insulation_6"/>
+        <result property="voltageResistance3" column="Voltage_resistance_3"/>
+        <result property="voltageResistance5" column="Voltage_resistance_5"/>
+        <result property="polarRegionInsulatio" column="Polar_region_Insulatio"/>
+        <result property="Insulatio5Qualified" column="Insulatio_5_qualified"/>
+        <result property="Insulatio6Qualified" column="Insulatio_6_qualified"/>
+        <result property="voltageResistance3Qualified" column="Voltage_resistance_3_qualified"/>
+        <result property="voltageResistance5Qualified" column="Voltage_resistance_5_qualified"/>
+        <result property="polarRegionInsulatioQualified" column="Polar_region_Insulatio_qualified"/>
+        <result property="overaJudgment" column="Overa_judgment"/>
+    </resultMap>
+
+    <sql id="selectMesDianCeXianReportVo">
+        SELECT
+        ID,
+        MCGS_Date,
+        MCGS_Time,
+        Barcode,
+        Equipment_NO,
+        "Batch Number" as batchNumber,
+        Insulation_1,
+        Insulation_2,
+        Insulation_3,
+        Insulation_4,
+        Voltage_resistance_1,
+        Voltage_resistance_2,
+        Insulatio_1_qualified,
+        Insulatio_2_qualified,
+        Insulatio_3_qualified,
+        Insulatio_4_qualified,
+        Voltage_resistance_1_qualified,
+        Voltage_resistance_2_qualified,
+        Connect1_qualified,
+        Connect2_qualified,
+        Connect3_qualified,
+        Connect4_qualified,
+        Interpolar_capability,
+        Interpolar_Loss,
+        Polar_region_capability,
+        Polar_region_Loss,
+        Interpolar_qualified,
+        Polar_region_qualified,
+        CONVERT(NVARCHAR(19), TRY_CONVERT(DATETIME, MCGS_Date + ' ' + MCGS_Time), 120) AS testdatetime,
+        Insulation_5,
+        Insulation_6,
+        Voltage_resistance_3,
+        Voltage_resistance_5,
+        Polar_region_Insulatio,
+        Insulatio_5_qualified,
+        Insulatio_6_qualified,
+        Voltage_resistance_3_qualified,
+        Voltage_resistance_5_qualified,
+        Polar_region_Insulatio_qualified,
+        Overa_judgment
+        FROM dbo.XM_LuoSiJi
+    </sql>
+
+    <select id="selectMesDianCeXianReportList" parameterType="MesDianCeXianReport" resultMap="MesReportDianCeXianResult">
+        <include refid="selectMesDianCeXianReportVo"/>
+        <where>
+            <if test="barcode != null and barcode != ''">
+                AND Barcode LIKE CONCAT('%', #{barcode}, '%')
+            </if>
+            <if test="equipmentNo != null and equipmentNo != ''">
+                AND Equipment_NO LIKE CONCAT('%', #{equipmentNo}, '%')
+            </if>
+            <if test="batchNumber != null and batchNumber != ''">
+                AND "Batch Number" LIKE CONCAT('%', #{batchNumber}, '%')
+            </if>
+            <if test="overaJudgment != null and overaJudgment != ''">
+                AND Overa_Judgment = #{overaJudgment}
+            </if>
+            <if test="testStartTime != null">
+                AND TRY_CONVERT(DATETIME, MCGS_Date + ' ' + MCGS_Time) &gt;= #{testStartTime}
+            </if>
+            <if test="testEndTime != null">
+                AND TRY_CONVERT(DATETIME, MCGS_Date + ' ' + MCGS_Time) &lt;= #{testEndTime}
+            </if>
+        </where>
+        order by ID desc
+    </select>
+
+</mapper>
